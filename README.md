@@ -88,9 +88,19 @@ Planned integrations for the next development phases:
 ```bash
 /src
   /components
-    FileUploader.jsx   # Drag-drop uploader with preview & remove option
-    Card.jsx           # Reusable card container
-    Button.jsx         # Reusable button component
+    FileUploader.tsx   # Drag-drop uploader with preview & remove option
+    Card.tsx           # Reusable card container
+    Input.tsx          # Required for Form handling
+    Selector.tsx       # Required for file handling
+    Button.tsx         # Reusable button component
+    Footer.tsx         # Common footer component
+    Navbar.tsx         # Navbar Component
+    Tag.tsx
+    VoiceRecorder.tsx
+  /screens
+    Home.tsx
+    Onbooarding.tsx
+    Dashboard.tsx
   App.jsx              # Root component, integrates all features
   index.css            # TailwindCSS styles
 ```
