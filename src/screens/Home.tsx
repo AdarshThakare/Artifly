@@ -9,7 +9,6 @@ import {
   Zap,
 } from "lucide-react";
 import { Footer } from "../components/Footer";
-import { VoiceRecorder } from "../components/VoiceRecorder";
 
 // Simple Button replacement
 const Button: React.FC<
