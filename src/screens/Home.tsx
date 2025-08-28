@@ -7,12 +7,9 @@ import {
   Heart,
   Users,
   Zap,
-  Home,
 } from "lucide-react";
 import { Footer } from "../components/Footer";
-import { Route, Routes, BrowserRouter } from "react-router-dom";
-import DashboardPage from "./Dashboard";
-import OnboardingPage from "./OnBoarding";
+import { VoiceRecorder } from "../components/VoiceRecorder";
 
 // Simple Button replacement
 const Button: React.FC<
@@ -86,34 +83,44 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-background to-muted py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="max-w-3xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 text-balance">
-              Empowering Local Artisans with{" "}
-              <span className="text-primary">AI</span>
-            </h1>
-            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-              Transform your craft into compelling stories. Upload your
-              creations, let AI help you describe them beautifully, and connect
-              with customers who value handmade artistry.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="/onboarding">
-                <Button asChild size="lg" className="px-8 py-6">
-                  <Sparkles className="h-5 w-5 mr-2" />
-                  Start Selling Your Craft
-                </Button>
-              </a>
+
+      <section className="relative h-[calc(100vh-64px)] flex items-center justify-center bg-gradient-to-b from-background via-muted to-background">
+        {/* Decorative background gradient/pattern */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-3xl opacity-30 animate-pulse" />
+          <div className="absolute bottom-10 left-10 w-[300px] h-[300px] bg-secondary/20 rounded-full blur-2xl opacity-30" />
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+          <h1 className="text-5xl md:text-7xl font-extrabold text-foreground leading-tight mb-6 animate-fadeIn">
+            Empowering Local Artisans with AI
+          </h1>
+          <p className="text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed animate-fadeIn [animation-delay:200ms]">
+            Transform your craft into compelling stories. Upload your creations,
+            let AI help you describe them beautifully, and connect with
+            customers who value handmade artistry.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-5 justify-center animate-fadeIn [animation-delay:400ms]">
+            <a href="/onboarding">
               <Button
-                asChild
+                size="lg"
+                className="px-10 py-6 rounded-2xl shadow-lg hover:scale-105 transition"
+              >
+                <Sparkles className="h-5 w-5 mr-2" />
+                Start Selling Your Craft
+              </Button>
+            </a>
+            <a href="#features">
+              <Button
                 variant="outline"
                 size="lg"
-                className="px-8 py-6 bg-transparent"
+                className="px-10 py-6 rounded-2xl bg-transparent hover:bg-muted/50 hover:scale-105 transition"
               >
-                <a href="#features">Learn More</a>
+                Learn More
               </Button>
-            </div>
+            </a>
           </div>
         </div>
       </section>
