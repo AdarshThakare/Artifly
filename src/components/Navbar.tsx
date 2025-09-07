@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Menu, X, Palette } from "lucide-react";
 import { Link, Routes, Route } from "react-router-dom";
 import DashboardPage from "../screens/Dashboard";
-import OnboardingPage from "../screens/OnBoarding";
+import OnboardingPage from "../screens/Onboarding";
 import HomePage from "../screens/Home";
 
 // Simple replacement for shadcn Button

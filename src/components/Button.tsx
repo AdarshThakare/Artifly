@@ -1,35 +1,37 @@
-import React from "react";
-
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "outline" | "destructive";
-  size?: "sm" | "md" | "lg";
-}
-
-export const Button: React.FC<ButtonProps> = ({
+export function Button({
   children,
+  onClick,
   variant = "default",
   size = "md",
-  ...props
-}) => {
+  className = "",
+  disabled,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  variant?: "default" | "outline" | "destructive";
+  size?: "sm" | "md" | "lg";
+  className?: string;
+  disabled?: boolean;
+}) {
   const base =
-    "inline-flex items-center justify-center font-medium rounded transition-colors";
-  const variants: Record<string, string> = {
+    "inline-flex items-center justify-center font-medium rounded-lg transition";
+  const sizes = {
+    sm: "px-3 py-1.5 text-sm",
+    md: "px-4 py-2 text-sm",
+    lg: "px-5 py-2.5 text-base",
+  };
+  const variants = {
     default: "bg-blue-600 text-white hover:bg-blue-700",
-    outline: "border border-gray-300 text-gray-800 hover:bg-gray-100",
-    destructive: "bg-red-600 text-white hover:bg-red-700",
+    outline: "border border-gray-300 text-gray-700 hover:bg-gray-100",
+    destructive: "text-red-600 hover:bg-red-50 border border-red-200",
   };
-  const sizes: Record<string, string> = {
-    sm: "px-2 py-1 text-sm",
-    md: "px-4 py-2 text-base",
-    lg: "px-6 py-3 text-lg",
-  };
-
   return (
     <button
-      className={`${base} ${variants[variant]} ${sizes[size]}`}
-      {...props}
+      onClick={onClick}
+      className={`${base} ${sizes[size]} ${variants[variant]} ${className}`}
+      disabled={disabled}
     >
       {children}
     </button>
   );
-};
+}

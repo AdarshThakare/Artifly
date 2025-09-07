@@ -13,6 +13,8 @@ import {
 import { Footer } from "../components/Footer";
 import { FileUploader } from "../components/FileUploader";
 import { TagChip } from "../components/Tag";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/Card";
+import { Button } from "../components/Button";
 
 interface Product {
   id: string;
@@ -23,75 +25,6 @@ interface Product {
   likes: number;
   rating: number;
   status: "active" | "draft";
-}
-
-// ✅ Simple reusable Card wrapper
-function Card({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={`rounded-xl border bg-white shadow-sm ${className}`}>
-      {children}
-    </div>
-  );
-}
-
-function CardHeader({ children }: { children: React.ReactNode }) {
-  return <div className="px-6 py-4 border-b">{children}</div>;
-}
-
-function CardTitle({ children }: { children: React.ReactNode }) {
-  return <h3 className="text-lg font-semibold">{children}</h3>;
-}
-
-function CardContent({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return <div className={`px-6 py-4 ${className}`}>{children}</div>;
-}
-
-// ✅ Reusable Button
-function Button({
-  children,
-  onClick,
-  variant = "default",
-  size = "md",
-  className = "",
-}: {
-  children: React.ReactNode;
-  onClick?: () => void;
-  variant?: "default" | "outline" | "destructive";
-  size?: "sm" | "md" | "lg";
-  className?: string;
-}) {
-  const base =
-    "inline-flex items-center justify-center font-medium rounded-lg transition";
-  const sizes = {
-    sm: "px-3 py-1.5 text-sm",
-    md: "px-4 py-2 text-sm",
-    lg: "px-5 py-2.5 text-base",
-  };
-  const variants = {
-    default: "bg-blue-600 text-white hover:bg-blue-700",
-    outline: "border border-gray-300 text-gray-700 hover:bg-gray-100",
-    destructive: "text-red-600 hover:bg-red-50 border border-red-200",
-  };
-  return (
-    <button
-      onClick={onClick}
-      className={`${base} ${sizes[size]} ${variants[variant]} ${className}`}
-    >
-      {children}
-    </button>
-  );
 }
 
 export default function DashboardPage() {

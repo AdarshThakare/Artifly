@@ -9,118 +9,69 @@ import {
   Zap,
 } from "lucide-react";
 import { Footer } from "../components/Footer";
-
-// Simple Button replacement
-const Button: React.FC<
-  React.ButtonHTMLAttributes<HTMLButtonElement> & {
-    variant?: "default" | "outline" | "secondary" | "destructive";
-    size?: "sm" | "lg";
-    asChild?: boolean;
-  }
-> = ({
-  children,
-  className = "",
-  variant = "default",
-  size = "sm",
-  asChild,
-  ...props
-}) => {
-  const base =
-    "inline-flex items-center justify-center font-medium rounded-md transition-colors";
-  const sizes: Record<string, string> = {
-    sm: "px-3 py-1 text-sm",
-    lg: "px-8 py-3 text-lg",
-  };
-  const variants: Record<string, string> = {
-    default: "bg-blue-600 text-white hover:bg-blue-700",
-    outline: "border border-gray-300 text-gray-700 hover:bg-gray-50",
-    secondary: "bg-white text-blue-600 hover:bg-gray-100",
-    destructive: "bg-red-500 text-white hover:bg-red-600",
-  };
-  if (asChild) {
-    return (
-      <a
-        className={`${base} ${sizes[size]} ${variants[variant]} ${className}`}
-        {...(props as any)}
-      >
-        {children}
-      </a>
-    );
-  }
-  return (
-    <button
-      className={`${base} ${sizes[size]} ${variants[variant]} ${className}`}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
-
-// Simple Card
-const Card: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
-  children,
-  className = "",
-  ...props
-}) => (
-  <div className={`rounded-xl border shadow bg-white ${className}`} {...props}>
-    {children}
-  </div>
-);
-
-const CardContent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
-  children,
-  className = "",
-  ...props
-}) => (
-  <div className={`p-6 ${className}`} {...props}>
-    {children}
-  </div>
-);
+import { Button } from "../components/Button";
+import { Card, CardContent } from "../components/Card";
+import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
 
-      <section className="relative h-[calc(100vh-64px)] flex items-center justify-center bg-gradient-to-b from-background via-muted to-background">
+      <section className="relative h-[calc(100vh-64px)] flex items-center justify-center pt-10 md:pb-10 bg-gradient-to-b from-background via-muted to-background">
         {/* Decorative background gradient/pattern */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-3xl opacity-30 animate-pulse" />
           <div className="absolute bottom-10 left-10 w-[300px] h-[300px] bg-secondary/20 rounded-full blur-2xl opacity-30" />
+          <img
+            src="platebg.svg"
+            alt=""
+            className="relative right-60 bottom-40 "
+          />
         </div>
 
         {/* Content */}
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <h1 className="text-5xl md:text-7xl font-extrabold text-foreground leading-tight mb-6 animate-fadeIn">
-            Empowering Local Artisans with AI
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed animate-fadeIn [animation-delay:200ms]">
-            Transform your craft into compelling stories. Upload your creations,
-            let AI help you describe them beautifully, and connect with
-            customers who value handmade artistry.
-          </p>
+        <div className="flex items-center justify-between">
+          <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+            <h1 className="text-6xl md:text-7xl 2xl:text-8xl font-extrabold text-foreground leading-tight mb-6 animate-fadeIn font-epunda! tracking-wide">
+              Empowering Local Artisans with AI
+            </h1>
+            <p className="text-xl md:text-2xl 2xl:text-[28px] px-4 text-muted-foreground mb-10 leading-relaxed animate-fadeIn [animation-delay:200ms]">
+              Transform your craft into compelling stories. Upload your
+              creations, let AI help you describe them beautifully, and connect
+              with customers who value handmade artistry.
+            </p>
 
-          <div className="flex flex-col sm:flex-row gap-5 justify-center animate-fadeIn [animation-delay:400ms]">
-            <a href="/onboarding">
-              <Button
-                size="lg"
-                className="px-10 py-6 rounded-2xl shadow-lg hover:scale-105 transition"
-              >
-                <Sparkles className="h-5 w-5 mr-2" />
-                Start Selling Your Craft
-              </Button>
-            </a>
-            <a href="#features">
-              <Button
-                variant="outline"
-                size="lg"
-                className="px-10 py-6 rounded-2xl bg-transparent hover:bg-muted/50 hover:scale-105 transition"
-              >
-                Learn More
-              </Button>
-            </a>
+            <div className="flex flex-col sm:flex-row gap-5 justify-center animate-fadeIn [animation-delay:400ms]">
+              <a href="/onboarding">
+                <Button
+                  size="lg"
+                  className="px-10 py-3 2xl:py-4 text-xl xl:text-2xl! rounded-2xl bg-accent! shadow-lg hover:scale-105 transition"
+                >
+                  <Sparkles className="h-5 w-5 mr-2" />
+                  Start Selling Your Craft
+                </Button>
+              </a>
+              <a href="#features">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="px-10  py-[11px] 2xl:py-[15px] text-xl xl:text-2xl! rounded-2xl bg-background! border-1 border-orange-800! hover:bg-muted/50 hover:scale-105 transition"
+                >
+                  Learn More
+                </Button>
+              </a>
+            </div>
           </div>
+
+          <img
+            src="pottery.svg"
+            alt=""
+            height={330}
+            width={330}
+            className="hidden md:block relative left-10 2xl:left-30 2xl:scale-130"
+          />
         </div>
       </section>
 
@@ -128,10 +79,10 @@ export default function HomePage() {
       <section id="features" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            <h2 className="text-4xl md:text-5xl 2xl:text-6xl font-epunda! font-bold text-foreground mb-4">
               Simple Tools for Artisan Success
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-2xl xl:text-2xl leading-relaxed text-muted-foreground max-w-2xl mx-auto">
               We've designed every feature with artisans in mind - simple,
               intuitive, and powerful.
             </p>
@@ -143,10 +94,10 @@ export default function HomePage() {
                 <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
                   <Upload className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">
+                <h3 className="text-2xl font-semibold text-foreground">
                   Smart Photo Upload
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-lg text-muted-foreground">
                   Simply upload your craft photos and our AI automatically
                   suggests categories, tags, and optimizations to make your
                   products shine.
@@ -159,10 +110,10 @@ export default function HomePage() {
                 <div className="mx-auto w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center">
                   <Mic className="h-8 w-8 text-secondary" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">
+                <h3 className="text-2xl font-semibold text-foreground">
                   Voice Storytelling
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-lg text-muted-foreground">
                   Tell your craft's story in your own words. Our AI transforms
                   your voice into compelling product descriptions that connect
                   with customers.
@@ -175,10 +126,10 @@ export default function HomePage() {
                 <div className="mx-auto w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center">
                   <BarChart3 className="h-8 w-8 text-accent" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">
+                <h3 className="text-2xl font-semibold text-foreground">
                   Growth Insights
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-lg text-muted-foreground">
                   Track which products resonate most with customers and get
                   AI-powered suggestions to improve your craft marketing.
                 </p>
@@ -189,15 +140,12 @@ export default function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-20 bg-muted">
+      <section id="how-it-works" className="pt-30 py-20 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Three Simple Steps to Success
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <h2 className="text-3xl 2xl:text-5xl font-epunda! md:text-[40px] font-bold text-foreground mb-4">
               From craft to customer in minutes, not hours.
-            </p>
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -227,10 +175,10 @@ export default function HomePage() {
                 >
                   {step}
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">
+                <h3 className="text-2xl font-semibold text-foreground">
                   {title}
                 </h3>
-                <p className="text-muted-foreground">{desc}</p>
+                <p className="text-lg text-muted-foreground">{desc}</p>
               </div>
             ))}
           </div>
@@ -238,7 +186,7 @@ export default function HomePage() {
       </section>
 
       {/* Testimonial Section */}
-      <section className="py-20">
+      <section className="py-20 pb-30 pt-0 bg-muted z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="bg-card p-8 rounded-2xl shadow-lg border">
             <div className="flex justify-center mb-6">
@@ -272,22 +220,56 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section id="cta" className="py-20 bg-primary text-primary-foreground">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+      <section
+        id="cta"
+        className="py-20 bg-primary text-primary-foreground relative overflow-clip"
+      >
+        <div className="flex items-center flex-col justify-center mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="max-w-xl text-3xl leading-16 md:text-5xl font-epunda! font-bold mb-6">
             Ready to Share Your Craft with the World?
           </h2>
-          <p className="text-xl mb-8 opacity-90">
+          <p className="text-xl xl:text-2xl max-w-xl leading-8 mb-8 opacity-90">
             Join thousands of artisans who've transformed their passion into
             profit with AI-powered storytelling.
           </p>
-          <a href="/onboarding">
-            <Button asChild size="lg" variant="secondary" className="px-8 py-6">
-              <Zap className="h-5 w-5 mr-2" />
-              Get Started Free
-            </Button>
-          </a>
+          <Button
+            size="lg"
+            variant="default"
+            onClick={() => navigate("/onboarding")}
+            className="text-xl 2xl:text-2xl! mt-8 bg-accent-foreground! px-8 py-6 hover:px-10 hover:border-accent transition-all duration-300"
+          >
+            <Zap className="h-5 w-5 mr-2" />
+            Get Started Free
+          </Button>
         </div>
+        <img
+          src="platebg.svg"
+          alt="sd"
+          height={420}
+          width={420}
+          className="hidden md:block absolute -left-30 -top-20 bg-[#0001] p-4 rounded-full "
+        />
+        <img
+          src="platebg.svg"
+          alt="sd"
+          height={420}
+          width={420}
+          className="hidden md:block absolute -left-30 -top-20  p-4 rounded-full "
+        />
+        <img
+          src="platebg.svg"
+          alt="sd"
+          height={420}
+          width={420}
+          className="hidden md:block absolute -right-30 top-50 bg-[#0001] p-4 rounded-full "
+        />
+        <img
+          src="platebg.svg"
+          alt="sd"
+          height={420}
+          width={420}
+          className="hidden md:block absolute -right-30 top-50   p-4 rounded-full "
+        />
       </section>
 
       <Footer />
