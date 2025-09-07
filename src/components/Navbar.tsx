@@ -1,11 +1,8 @@
 import React, { useState } from "react";
 import { Menu, X, Palette } from "lucide-react";
-import { Link, Routes, Route } from "react-router-dom";
-import DashboardPage from "../screens/Dashboard";
-import OnboardingPage from "../screens/Onboarding";
-import HomePage from "../screens/Home";
+import { Link, useNavigate } from "react-router-dom";
+import { useUser, UserButton, SignInButton } from "@clerk/clerk-react";
 
-// Simple replacement for shadcn Button
 const Button: React.FC<
   React.ButtonHTMLAttributes<HTMLButtonElement> & {
     variant?: "ghost" | "default";
@@ -28,87 +25,98 @@ const Button: React.FC<
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { isSignedIn } = useUser();
 
   return (
-    <>
-      <nav className="bg-card border-b border-border sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2">
-              <Palette className="h-8 w-8 text-primary" />
-              <span className="text-xl font-bold text-foreground">Artivio</span>
-            </Link>
+    <nav className="bg-card border-b border-border sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2">
+            <Palette className="h-8 w-8 text-primary" />
+            <span className="text-xl font-bold text-foreground">Artivio</span>
+          </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link to="/" className="text-foreground hover:text-primary">
+              Home
+            </Link>
+            <Link
+              to="/onboarding"
+              className="text-foreground hover:text-primary"
+            >
+              Get Started
+            </Link>
+            {isSignedIn && (
+              <Link
+                to="/dashboard"
+                className="text-foreground hover:text-primary"
+              >
+                Dashboard
+              </Link>
+            )}
+            {!isSignedIn ? (
+              <SignInButton mode="modal">
+                <Button variant="default">Sign in</Button>
+              </SignInButton>
+            ) : (
+              <UserButton />
+            )}
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <Button variant="ghost" onClick={() => setIsOpen(!isOpen)}>
+              {isOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation */}
+        {isOpen && (
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 text-xl! bg-card border-t border-border">
               <Link
                 to="/"
-                className="text-foreground hover:text-primary transition-colors"
+                className="block px-3 py-2 text-foreground  hover:text-primary"
+                onClick={() => setIsOpen(false)}
               >
                 Home
               </Link>
               <Link
                 to="/onboarding"
-                className="text-foreground hover:text-primary transition-colors"
+                className="block px-3 py-2 text-foreground hover:text-primary"
+                onClick={() => setIsOpen(false)}
               >
                 Get Started
               </Link>
-              <Link
-                to="/dashboard"
-                className="text-foreground hover:text-primary transition-colors"
-              >
-                Dashboard
-              </Link>
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <Button variant="ghost" onClick={() => setIsOpen(!isOpen)}>
-                {isOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* Mobile Navigation */}
-          {isOpen && (
-            <div className="md:hidden">
-              <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-card border-t border-border">
-                <a
-                  href="/"
-                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Home
-                </a>
-                <a
-                  href="/onboarding"
-                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Get Started
-                </a>
-                <a
-                  href="/dashboard"
-                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
+              {isSignedIn && (
+                <Link
+                  to="/dashboard"
+                  className="block px-3 py-2 text-foreground hover:text-primary"
                   onClick={() => setIsOpen(false)}
                 >
                   Dashboard
-                </a>
-              </div>
+                </Link>
+              )}
+              {!isSignedIn ? (
+                <SignInButton mode="modal">
+                  <Button variant="default" className="w-full">
+                    Sign in
+                  </Button>
+                </SignInButton>
+              ) : (
+                <UserButton />
+              )}
             </div>
-          )}
-        </div>
-      </nav>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/onboarding" element={<OnboardingPage />} />
-      </Routes>
-    </>
+          </div>
+        )}
+      </div>
+    </nav>
   );
 }

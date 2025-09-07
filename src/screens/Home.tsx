@@ -32,9 +32,9 @@ export default function HomePage() {
         </div>
 
         {/* Content */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between 2xl:gap-20">
           <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-            <h1 className="text-6xl md:text-7xl 2xl:text-8xl font-extrabold text-foreground leading-tight mb-6 animate-fadeIn font-epunda! tracking-wide">
+            <h1 className="text-5xl md:text-6xl xl:text-7xl 2xl:text-8xl font-extrabold text-foreground leading-tight mb-6 animate-fadeIn font-epunda! tracking-wide">
               Empowering Local Artisans with AI
             </h1>
             <p className="text-xl md:text-2xl 2xl:text-[28px] px-4 text-muted-foreground mb-10 leading-relaxed animate-fadeIn [animation-delay:200ms]">
