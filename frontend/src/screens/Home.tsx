@@ -11,6 +11,9 @@ import { Footer } from "../components/Footer";
 import { Button } from "../components/Button";
 import { Card, CardContent } from "../components/Card";
 import { useNavigate } from "react-router-dom";
+import { IoCloudUploadOutline } from "react-icons/io5";
+import { BsStars } from "react-icons/bs";
+import { RiShoppingBag4Line } from "react-icons/ri";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -150,29 +153,29 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                step: 1,
+                icon: <IoCloudUploadOutline size={40} />,
                 color: "bg-primary",
                 title: "Upload & Describe",
                 desc: "Upload photos of your craft and tell us about your creation process, materials, and inspiration.",
               },
               {
-                step: 2,
+                icon: <BsStars size={40} />,
                 color: "bg-secondary",
                 title: "AI Enhancement",
                 desc: "Our AI creates compelling product stories, suggests optimal pricing, and generates SEO-friendly descriptions.",
               },
               {
-                step: 3,
+                icon: <RiShoppingBag4Line size={40} />,
                 color: "bg-accent",
                 title: "Connect & Sell",
                 desc: "Your beautifully presented crafts reach customers who appreciate handmade artistry and authentic stories.",
               },
-            ].map(({ step, color, title, desc }) => (
-              <div key={step} className="text-center space-y-4">
+            ].map(({ icon, color, title, desc }) => (
+              <div key={color} className="text-center space-y-4">
                 <div
                   className={`mx-auto w-20 h-20 ${color} rounded-full flex items-center justify-center text-white text-2xl font-bold`}
                 >
-                  {step}
+                  {icon}
                 </div>
                 <h3 className="text-2xl font-semibold text-foreground">
                   {title}
