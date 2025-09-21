@@ -12,7 +12,6 @@ export default function OnboardingPage() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [aiName, setAiName] = useState<string>("");
   const [aiCategory, setAiCategory] = useState<string>("");
-  const [storyContent, setStoryContent] = useState<string>("");
 
   const handleNext = () => {
     setDirection("forward");

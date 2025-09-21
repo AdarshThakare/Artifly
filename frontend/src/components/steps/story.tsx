@@ -4,7 +4,7 @@ import { Button } from "../Button";
 import { VoiceRecorder } from "../VoiceRecorder";
 import { Tag, ArrowLeft, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+
 import axios from "axios";
 
 interface Step2Props {

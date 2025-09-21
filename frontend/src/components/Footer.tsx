@@ -1,4 +1,4 @@
-import { Palette, Heart } from "lucide-react";
+import { Palette } from "lucide-react";
 
 export function Footer() {
   return (
