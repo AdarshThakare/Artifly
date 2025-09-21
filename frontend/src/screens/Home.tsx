@@ -202,7 +202,7 @@ export default function HomePage() {
               </div>
             </div>
             <blockquote className="text-xl text-foreground mb-6">
-              "Artivio helped me turn my pottery hobby into a thriving business.
+              "ARTIFLY helped me turn my pottery hobby into a thriving business.
               The AI understood my story and helped me express what makes each
               piece special. My sales increased by 300% in just two months!"
             </blockquote>

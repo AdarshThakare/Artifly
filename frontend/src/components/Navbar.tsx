@@ -34,7 +34,7 @@ export function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <Palette className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-foreground">Artivio</span>
+            <span className="text-xl font-bold text-foreground">ARTIFLY</span>
           </Link>
 
           {/* Desktop Navigation */}

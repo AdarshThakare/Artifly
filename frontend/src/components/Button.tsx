@@ -14,7 +14,7 @@ export function Button({
   disabled?: boolean;
 }) {
   const base =
-    "inline-flex items-center justify-center font-medium rounded-lg transition";
+    "inline-flex items-center justify-center font-medium rounded-lg transition font-outfit! tracking-wider ";
   const sizes = {
     sm: "px-3 py-1.5 text-sm",
     md: "px-4 py-2 text-sm",

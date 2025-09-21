@@ -10,7 +10,7 @@ export function Footer() {
             <div className="flex items-center space-x-2 mb-4">
               <Palette className="h-8 w-8 text-primary" />
               <span className="text-3xl font-bold text-foreground">
-                Artivio
+                ARTIFLY
               </span>
             </div>
             <p className="text-muted-foreground text-lg leading-relaxed max-w-md">
@@ -88,8 +88,7 @@ export function Footer() {
 
         <div className="border-t border-border mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
           <p className="text-muted-foreground text-md">
-            © 2024 Artivio. Made with{" "}
-            <Heart className="h-4 w-4 text-primary inline mx-1" /> for artisans.
+            © 2025 ARTIFLY. Made by NEXTGEN-CODECRAFTERS
           </p>
           <div className="flex space-x-6 mt-4 sm:mt-0">
             <a
@@ -123,7 +122,7 @@ export function Footer() {
 //           <div className="col-span-1 md:col-span-2">
 //             <div className="flex items-center space-x-2 mb-4">
 //               <Palette className="h-8 w-8 text-primary" />
-//               <span className="text-xl font-bold text-background">Artivio</span>
+//               <span className="text-xl font-bold text-background">ARTIFLY</span>
 //             </div>
 //             <p className="text-background text-md leading-relaxed max-w-md">
 //               Empowering local artisans with AI-powered tools to showcase their
@@ -195,7 +194,7 @@ export function Footer() {
 
 //         <div className="border-t border-border mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
 //           <p className="text-background text-md">
-//             © 2024 Artivio. Made with{" "}
+//             © 2024 ARTIFLY. Made with{" "}
 //             <Heart className="h-4 w-4 text-primary inline mx-1" /> for artisans.
 //           </p>
 //           <div className="flex space-x-6 mt-4 sm:mt-0">

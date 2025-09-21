@@ -1,37 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { Upload, X, ImageIcon } from "lucide-react";
-
-// Replace with your own components (or keep plain HTML + Tailwind)
-const Card: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
-  children,
-  className = "",
-  ...props
-}) => (
-  <div className={`rounded-xl shadow-sm bg-white ${className}`} {...props}>
-    {children}
-  </div>
-);
-
-const Button: React.FC<
-  React.ButtonHTMLAttributes<HTMLButtonElement> & {
-    variant?: "outline" | "destructive";
-  }
-> = ({ children, className = "", variant, ...props }) => {
-  let base =
-    "px-3 py-2 rounded-lg font-medium text-sm transition-colors flex items-center justify-center";
-  let variants: Record<string, string> = {
-    outline: "border border-gray-300 text-gray-700 hover:bg-gray-50",
-    destructive: "bg-red-500 text-white hover:bg-red-600",
-  };
-  return (
-    <button
-      className={`${base} ${variant ? variants[variant] : ""} ${className}`}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
+import { Card } from "./Card";
+import { Button } from "./Button";
 
 interface FileUploaderProps {
   onFilesChange: (files: File[]) => void;
@@ -86,9 +56,9 @@ export function FileUploader({
   return (
     <div className="space-y-4">
       <Card
-        className={`p-8 border-2 border-dashed transition-colors ${
+        className={`p-8 border-2 md:w-md border-solid shadow-sm transition-colors ${
           dragActive
-            ? "border-blue-500 bg-blue-50"
+            ? "border-blue-500 bg-blue-50!"
             : "border-gray-300 hover:border-blue-400"
         }`}
         onDragEnter={handleDrag}
@@ -96,10 +66,8 @@ export function FileUploader({
         onDragOver={handleDrag}
         onDrop={handleDrop}
       >
-        <div className="text-center space-y-4">
-          <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-            <Upload className="h-6 w-6 text-blue-600" />
-          </div>
+        <div className="flex flex-col text-center py-10 items-center justify-center space-y-4">
+          <ImageIcon className="h-18 w-18 text-blue-400 hover:text-blue-500 " />
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
               Upload Your Craft Photos
@@ -112,7 +80,7 @@ export function FileUploader({
             variant="outline"
             onClick={() => document.getElementById("file-input")?.click()}
           >
-            <ImageIcon className="h-4 w-4 mr-2" />
+            <Upload className="h-4 w-4 mr-2" />
             Choose Files
           </Button>
           <input
@@ -123,32 +91,39 @@ export function FileUploader({
             onChange={(e) => handleFiles(e.target.files)}
             className="hidden"
           />
+
+          {files.length > 0 && (
+            <>
+              <div className="w-full h-0 my-3 mb-7 rounded-full border-t-1" />
+              <h3 className="text-lg font-semibold text-gray-900">
+                Your Selected Image:-
+              </h3>
+              <div className="flex justify-center w-2 md:w-3">
+                {files.map((file, index) => (
+                  <Card key={index} className="relative p-2">
+                    <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center relative overflow-hidden">
+                      <img
+                        src={URL.createObjectURL(file) || "/placeholder.svg"}
+                        alt={`Upload ${index + 1}`}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                      <Button
+                        className="absolute top-2 right-2 h-6 w-6 p-0 rounded-full bg-red-500 hover:bg-red-600"
+                        onClick={() => removeFile(index)}
+                      >
+                        <X className="absolute h-4 w-4 text-white" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2 truncate">
+                      {file.name}
+                    </p>
+                  </Card>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </Card>
-
-      {files.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {files.map((file, index) => (
-            <Card key={index} className="relative p-2">
-              <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center relative overflow-hidden">
-                <img
-                  src={URL.createObjectURL(file) || "/placeholder.svg"}
-                  alt={`Upload ${index + 1}`}
-                  className="w-full h-full object-cover rounded-lg"
-                />
-                <Button
-                  variant="destructive"
-                  className="absolute top-2 right-2 h-6 w-6 p-0 rounded-full"
-                  onClick={() => removeFile(index)}
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </div>
-              <p className="text-xs text-gray-500 mt-2 truncate">{file.name}</p>
-            </Card>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

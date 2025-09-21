@@ -1,7 +1,7 @@
 # Full Colab Code with multimodal text and image input
 
 # Step 1: Install and configure API
-!pip install -q -U google-generativeai
+# !pip install -q -U google-generativeai
 import google.generativeai as genai
 import os
 from google.colab import userdata, files
