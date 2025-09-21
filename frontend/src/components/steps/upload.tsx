@@ -58,6 +58,33 @@ export default function Step3Upload({
     }
   };
 
+  const storeSelectedImage = async (image: string) => {
+    const productId = localStorage.getItem("productId");
+    console.log(productId);
+
+    const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
+
+    try {
+      const response = await axios.post(
+        "https://genai-exchange-llm-api-3.onrender.com/store_image",
+        {
+          product_id: productId,
+          image_base64: base64Data,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("✅ Image storage success:", response.data);
+
+      console.log("Image storage", response.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const imageUrlToBase64 = (url: string): Promise<string> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -142,7 +169,7 @@ export default function Step3Upload({
       exit={{ x: direction === "forward" ? -80 : 80, opacity: 0 }}
       className=" w-full"
     >
-      <Card className="backdrop-blur-md bg-white/80 dark:bg-gray-900/70 shadow-xl rounded-2xl p-6 border border-gray-200 dark:border-gray-800">
+      <Card className=" backdrop-blur-md bg-white/80 dark:bg-gray-900/70 shadow-xl rounded-2xl p-6 border border-gray-200 dark:border-gray-800">
         <h2 className="font-semibold font-outfit! tracking-wide md:text-xl mb-6 text-md flex  items-center gap-2">
           <ImageIcon />
           Step 1: Get Started by Uploading A Photo of your Product
@@ -245,6 +272,8 @@ export default function Step3Upload({
                 : "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300!"
             } transition-all duration-200`}
             onClick={() => {
+              const image = localStorage.getItem("ImageBase64");
+              if (image) storeSelectedImage(image);
               onNext();
             }}
           >

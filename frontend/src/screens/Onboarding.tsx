@@ -90,7 +90,6 @@ export default function OnboardingPage() {
                     key="step4"
                     direction={direction}
                     onPrevious={handlePrevious}
-                    onSubmit={() => {}}
                   />
                 )}
               </AnimatePresence>

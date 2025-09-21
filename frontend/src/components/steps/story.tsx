@@ -42,6 +42,32 @@ export default function Step2Story({
     return new File([u8arr], filename, { type: mime });
   }
 
+  const storeData = async (story: string) => {
+    const productId = localStorage.getItem("productId");
+    console.log(productId);
+    console.log(story);
+
+    try {
+      const response = await axios.post(
+        "https://genai-exchange-llm-api-3.onrender.com/store_story",
+        {
+          product_id: productId,
+          story: story,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("✅ Description storage success:", response.data);
+
+      console.log("Description storage", response.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const generateTagsAndCaption = async () => {
     if (!typedText.trim()) {
       alert("Please fill in the description first!");
@@ -87,6 +113,31 @@ export default function Step2Story({
       console.error("Error fetching AI titles:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const storeDescription = async () => {
+    const productId = localStorage.getItem("productId");
+    console.log(productId);
+
+    try {
+      const response = await axios.post(
+        "https://genai-exchange-llm-api-3.onrender.com/store_description",
+        {
+          product_id: productId,
+          description: typedText,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("✅ Story storage success:", response.data);
+
+      console.log("Story storage", response.data);
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -222,13 +273,14 @@ export default function Step2Story({
               if (finalStory) {
                 localStorage.setItem("story", selectedDescription);
               }
-              onNext();
-              console.log("User's story:", finalStory);
-
+              storeDescription();
+              storeData(selectedDescription);
               generateTagsAndCaption();
+              console.log("User's story:", finalStory);
+              onNext();
             }}
           >
-            Finish
+            Next
           </Button>
         </div>
       </Card>

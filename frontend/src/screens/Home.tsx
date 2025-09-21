@@ -6,6 +6,9 @@ import {
   Heart,
   Users,
   Zap,
+  Mail,
+  Palette,
+  HandMetal,
 } from "lucide-react";
 import { Footer } from "../components/Footer";
 import { Button } from "../components/Button";
@@ -14,9 +17,57 @@ import { useNavigate } from "react-router-dom";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { BsStars } from "react-icons/bs";
 import { RiShoppingBag4Line } from "react-icons/ri";
+import { createProduct } from "./Dashboard";
 
 export default function HomePage() {
   const navigate = useNavigate();
+
+  // Sample artisan data - in a real app, this would come from your API
+  const artisans = [
+    {
+      name: "Emma Thompson",
+      categories: ["Pottery", "Ceramics", "Home Decor"],
+      email: "emma.pottery@email.com",
+      location: "Portland, OR",
+      avatar: "ET",
+    },
+    {
+      name: "Carlos Martinez",
+      categories: ["Woodworking", "Furniture", "Sculptures"],
+      email: "carlos.wood@email.com",
+      location: "Austin, TX",
+      avatar: "CM",
+    },
+    {
+      name: "Aisha Patel",
+      categories: ["Textiles", "Embroidery", "Fashion"],
+      email: "aisha.textiles@email.com",
+      location: "San Francisco, CA",
+      avatar: "AP",
+    },
+    {
+      name: "Miguel Santos",
+      categories: ["Jewelry", "Metalwork", "Accessories"],
+      email: "miguel.jewelry@email.com",
+      location: "Miami, FL",
+      avatar: "MS",
+    },
+    {
+      name: "Sarah Chen",
+      categories: ["Painting", "Digital Art", "Prints"],
+      email: "sarah.art@email.com",
+      location: "Seattle, WA",
+      avatar: "SC",
+    },
+    {
+      name: "David Kumar",
+      categories: ["Leather Goods", "Bags", "Accessories"],
+      email: "david.leather@email.com",
+      location: "Denver, CO",
+      avatar: "DK",
+    },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
@@ -46,15 +97,14 @@ export default function HomePage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-5 justify-center animate-fadeIn [animation-delay:400ms]">
-              <a href="/onboarding">
-                <Button
-                  size="lg"
-                  className="px-10 py-3 2xl:py-4 text-xl xl:text-2xl! rounded-2xl bg-accent! shadow-lg hover:scale-105 transition"
-                >
-                  <Sparkles className="h-5 w-5 mr-2" />
-                  Start Selling Your Craft
-                </Button>
-              </a>
+              <Button
+                size="lg"
+                onClick={() => navigate("/dashboard")}
+                className="px-10 py-3 2xl:py-4 text-xl xl:text-2xl! rounded-2xl bg-accent! shadow-lg hover:scale-105 transition"
+              >
+                <Sparkles className="h-5 w-5 mr-2" />
+                Start Selling Your Craft
+              </Button>
               <a href="#features">
                 <Button
                   variant="outline"
@@ -137,6 +187,100 @@ export default function HomePage() {
                 </p>
               </CardContent>
             </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Artisan Collaboration Section */}
+      <section
+        id="artisan-collaboration"
+        className="py-20 bg-gradient-to-b from-background to-muted/50"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                <HandMetal className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <h2 className="text-4xl md:text-5xl 2xl:text-6xl font-epunda! font-bold text-foreground mb-4">
+              Artisans with same interests you can start collaborating with!
+            </h2>
+            <p className="text-xl xl:text-2xl leading-relaxed text-muted-foreground max-w-3xl mx-auto">
+              Connect with fellow artisans, share techniques, collaborate on
+              projects, and grow together in the creative community.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {artisans.map((artisan, index) => (
+              <Card
+                key={index}
+                className="group hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border-l-4 border-l-primary/30 hover:border-l-primary"
+              >
+                <CardContent className="p-6 space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-bold text-lg">
+                      {artisan.avatar}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
+                        {artisan.name}
+                      </h3>
+                      <p className="text-sm text-muted-foreground flex items-center">
+                        <Users className="h-3 w-3 mr-1" />
+                        {artisan.location}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center">
+                      <Palette className="h-4 w-4 text-secondary mr-2" />
+                      <span className="text-sm font-medium text-foreground">
+                        Specializes in:
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {artisan.categories.map((category, catIndex) => (
+                        <span
+                          key={catIndex}
+                          className="px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full hover:bg-primary/20 transition-colors"
+                        >
+                          {category}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-muted">
+                    <Button
+                      variant="outline"
+                      className="w-full text-sm hover:bg-primary/10 hover:text-primary hover:border-primary transition-all duration-200"
+                      onClick={() =>
+                        window.open(
+                          `mailto:${artisan.email}?subject=Collaboration Inquiry from ARTIFLY`
+                        )
+                      }
+                    >
+                      <Mail className="h-4 w-4 mr-2" />
+                      Connect for Collaboration
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Button
+              variant="outline"
+              size="lg"
+              className="px-8 py-3 text-lg rounded-2xl border-2 border-primary/30 hover:border-primary hover:bg-primary/5 transition-all duration-300"
+            >
+              <Users className="h-5 w-5 mr-2" />
+              View All Artisans
+            </Button>
           </div>
         </div>
       </section>
@@ -237,7 +381,10 @@ export default function HomePage() {
           <Button
             size="lg"
             variant="default"
-            onClick={() => navigate("/onboarding")}
+            onClick={() => {
+              createProduct();
+              navigate("/onboarding");
+            }}
             className="text-xl 2xl:text-2xl! mt-8 bg-accent-foreground! px-8 py-6 hover:px-10 hover:border-accent transition-all duration-300"
           >
             <Zap className="h-5 w-5 mr-2" />

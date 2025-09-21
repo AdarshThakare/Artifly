@@ -150,6 +150,58 @@ export default function Step1Basics({
 
   const isNextDisabled = !selectedTitle || !location.trim();
 
+  const storePrimitives = async () => {
+    const productId = localStorage.getItem("productId");
+    console.log(productId);
+
+    try {
+      const response = await axios.post(
+        "https://genai-exchange-llm-api-3.onrender.com/store_name_category_location",
+        {
+          product_id: productId,
+          name: selectedTitle,
+          category: selectedCategory,
+          location: location,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("✅ Primitive storage success:", response.data);
+
+      console.log("Primitive storage", response.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const storeData = async (title: string) => {
+    const productId = localStorage.getItem("productId");
+    console.log(productId);
+
+    try {
+      const response = await axios.post(
+        "https://genai-exchange-llm-api-3.onrender.com/store_title",
+        {
+          product_id: productId,
+          title: title,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("✅ Title storage success:", response.data);
+
+      console.log("Title storage", response.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <motion.div
       key="step1"
@@ -296,9 +348,8 @@ export default function Step1Basics({
                   <motion.button
                     key={idx}
                     onClick={() => setSelectedTitle(t)}
-                    whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
-                    className={`w-full md:grid md:grid-cols-2 text-left px-4 py-2 rounded-xl border transition ${
+                    className={`w-full md:grid md:grid-cols-2 text-left px-4 py-2 rounded-xl hover:border-2 hover:border-sky-500 border transition ${
                       selectedTitle === t
                         ? "bg-gradient-to-r from-blue-600 to-indigo-500 text-white border-blue-600 shadow"
                         : "bg-white/70 dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:border-blue-500"
@@ -318,7 +369,8 @@ export default function Step1Basics({
             <Button
               onClick={() => {
                 localStorage.setItem("userTitle", selectedTitle);
-
+                storePrimitives();
+                storeData(selectedTitle);
                 onNext();
               }}
               disabled={isNextDisabled}

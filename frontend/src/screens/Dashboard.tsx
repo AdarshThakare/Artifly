@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Upload,
   Edit,
@@ -9,67 +8,100 @@ import {
   Star,
   BarChart3,
   Plus,
+  Image as ImageIcon,
+  Calendar,
+  MapPin,
+  Tag,
 } from "lucide-react";
 import { Footer } from "../components/Footer";
-import { FileUploader } from "../components/FileUploader";
-import { TagChip } from "../components/Tag";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/Card";
 import { Button } from "../components/Button";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 interface Product {
-  id: string;
+  _id: string;
   name: string;
-  image: string;
-  tags: string[];
-  views: number;
-  likes: number;
-  rating: number;
-  status: "active" | "draft";
+  category: string;
+  location: string;
+  description: string;
+  title: string;
+  story: string;
+  caption: string;
+  hashtags: string[];
+  seo_tags: string[];
+  image_base64: string;
+  timestamp: string;
 }
 
+export const createProduct = async () => {
+  try {
+    const response = await axios.post(
+      "https://genai-exchange-llm-api-3.onrender.com/create_product"
+    );
+    localStorage.setItem("productId", response.data.product_id);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export default function DashboardPage() {
-  const [showUpload, setShowUpload] = useState(false);
-  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+  const navigate = useNavigate();
+  const [products, setProducts] = useState<Product[]>([]);
 
-  // Mock data
-  const products: Product[] = [
-    {
-      id: "1",
-      name: "Handcrafted Ceramic Vase",
-      image: "/image.png",
-      tags: ["handmade", "ceramic", "home-decor"],
-      views: 245,
-      likes: 18,
-      rating: 4.8,
-      status: "active",
-    },
-    {
-      id: "2",
-      name: "Woven Basket Set",
-      image: "/image.png",
-      tags: ["woven", "natural", "storage"],
-      views: 189,
-      likes: 12,
-      rating: 4.6,
-      status: "active",
-    },
-    {
-      id: "3",
-      name: "Leather Journal Cover",
-      image: "/image.png",
-      tags: ["leather", "handstitched", "stationery"],
-      views: 156,
-      likes: 9,
-      rating: 4.9,
-      status: "draft",
-    },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "https://genai-exchange-llm-api-3.onrender.com/products",
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log("✅ Array of products:", response.data.products);
+        setProducts(response.data.products);
+        console.log("Description storage", response.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchData();
+  }, []);
 
-  const handleUpload = () => {
-    if (uploadFiles.length > 0) {
-      console.log("Uploading files:", uploadFiles);
-      setUploadFiles([]);
-      setShowUpload(false);
+  const formatDate = (timestamp: string) => {
+    return new Date(timestamp).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const getStatusBadge = (product: Product) => {
+    const hasContent =
+      product.name || product.description || product.title || product.story;
+    const hasImage = product.image_base64;
+
+    if (hasContent && hasImage) {
+      return (
+        <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+          Active
+        </span>
+      );
+    } else if (hasContent || hasImage) {
+      return (
+        <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+          In Progress
+        </span>
+      );
+    } else {
+      return (
+        <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
+          Draft
+        </span>
+      );
     }
   };
 
@@ -165,92 +197,178 @@ export default function DashboardPage() {
                     Upload New Product
                   </span>
                   <Button
-                    onClick={() => setShowUpload(!showUpload)}
-                    variant={showUpload ? "outline" : "default"}
+                    onClick={() => {
+                      createProduct();
+                      navigate("/onboarding");
+                    }}
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    {showUpload ? "Cancel" : "Add Product"}
+                    Add Product
                   </Button>
                 </div>
               </CardTitle>
             </CardHeader>
-            {showUpload && (
-              <CardContent className="space-y-6">
-                <FileUploader onFilesChange={setUploadFiles} maxFiles={5} />
-                {uploadFiles.length > 0 && (
-                  <div className="flex justify-end">
-                    <Button onClick={handleUpload}>
-                      <Upload className="h-4 w-4 mr-2" />
-                      Upload & Generate Story
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            )}
           </Card>
 
-          {/* Product List */}
+          {/* Product Listings */}
           <Card>
             <CardHeader>
-              <CardTitle>Your Products</CardTitle>
+              <CardTitle>
+                <span>Your Products ({products.length})</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    createProduct();
+                    navigate("/onboarding");
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Product
+                </Button>
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {products.map((product) => (
-                  <Card key={product.id} className="overflow-hidden">
-                    <div className="aspect-square relative">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute top-2 right-2">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            product.status === "active"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }`}
-                        >
-                          {product.status}
-                        </span>
+              {products.length === 0 ? (
+                <div className="text-center py-12">
+                  <ImageIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    No products yet
+                  </h3>
+                  <p className="text-gray-500 mb-6">
+                    Get started by uploading your first craft!
+                  </p>
+                  <Button
+                    onClick={() => {
+                      createProduct();
+                      navigate("/onboarding");
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Upload Your First Product
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {products.map((product) => (
+                    <div
+                      key={product._id}
+                      className="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-gray-200 hover:-translate-y-1"
+                    >
+                      {/* Product Image */}
+                      <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+                        {product.image_base64 ? (
+                          <img
+                            src={`data:image/jpeg;base64,${product.image_base64}`}
+                            alt={product.name || "Product"}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <ImageIcon className="h-16 w-16 text-gray-300" />
+                          </div>
+                        )}
+
+                        {/* Status Badge */}
+                        <div className="absolute top-3 left-3">
+                          {getStatusBadge(product)}
+                        </div>
+
+                        {/* Action Buttons Overlay */}
+                        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0 bg-white/90 hover:bg-white border-white/50 hover:border-white shadow-sm"
+                            onClick={() =>
+                              navigate(`/edit-product/${product._id}`)
+                            }
+                          >
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0 bg-white/90 hover:bg-red-50 border-white/50 hover:border-red-200 shadow-sm text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Product Info */}
+                      <div className="p-4">
+                        <div className="mb-3">
+                          <h3 className="font-semibold text-gray-900 text-sm line-clamp-1 mb-1">
+                            {product.name ||
+                              product.title ||
+                              "Untitled Product"}
+                          </h3>
+
+                          {product.caption && (
+                            <p className="text-gray-600 text-xs line-clamp-2 leading-relaxed">
+                              {product.caption}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Category and Location */}
+                        <div className="space-y-1 mb-3">
+                          {product.category && (
+                            <div className="flex items-center text-xs text-gray-500">
+                              <Tag className="h-3 w-3 mr-1 text-blue-500" />
+                              {product.category}
+                            </div>
+                          )}
+                          {product.location && (
+                            <div className="flex items-center text-xs text-gray-500">
+                              <MapPin className="h-3 w-3 mr-1 text-green-500" />
+                              {product.location}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Hashtags */}
+                        {product.hashtags && product.hashtags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            {product.hashtags
+                              .slice(0, 2)
+                              .map((hashtag, index) => (
+                                <span
+                                  key={index}
+                                  className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-md font-medium"
+                                >
+                                  #{hashtag}
+                                </span>
+                              ))}
+                            {product.hashtags.length > 2 && (
+                              <span className="px-2 py-1 bg-gray-50 text-gray-500 text-xs rounded-md">
+                                +{product.hashtags.length - 2}
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Stats and Date */}
+                        <div className="flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-gray-50">
+                          <div className="flex items-center space-x-3">
+                            <span className="flex items-center">
+                              <Eye className="h-3 w-3 mr-1" />0
+                            </span>
+                            <span className="flex items-center">
+                              <Heart className="h-3 w-3 mr-1" />0
+                            </span>
+                          </div>
+                          <span className="flex items-center">
+                            <Calendar className="h-3 w-3 mr-1" />
+                            {formatDate(product.timestamp)}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <CardContent>
-                      <h3 className="font-semibold text-gray-900 mb-2">
-                        {product.name}
-                      </h3>
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        {product.tags.map((tag, index) => (
-                          <TagChip key={index} tag={tag} />
-                        ))}
-                      </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                        <span className="flex items-center gap-1">
-                          <Eye className="h-4 w-4" />
-                          {product.views}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Heart className="h-4 w-4" />
-                          {product.likes}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Star className="h-4 w-4" />
-                          {product.rating}
-                        </span>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline" className="flex-1">
-                          <Edit className="h-4 w-4 mr-1" /> Edit
-                        </Button>
-                        <Button size="sm" variant="destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

@@ -11,15 +11,16 @@ import {
   MoreHorizontal,
   Globe,
 } from "lucide-react";
+import { useUser } from "@clerk/clerk-react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function PreviewPage({
   onPrevious,
   direction,
-  onSubmit,
 }: {
   onPrevious: () => void;
   direction: "forward" | "backward";
-  onSubmit: (caption: string) => void;
 }) {
   const [selectedCaption, setSelectedCaption] = useState<string>("");
   const [selectedPlatform, setSelectedPlatform] = useState<
@@ -34,6 +35,43 @@ export default function PreviewPage({
   const [hashtags, setHashtags] = useState<string[]>([]);
   const [seoTags, setSeoTags] = useState<string[]>([]);
   const [imageBase64, setImageBase64] = useState("");
+
+  const { user } = useUser();
+
+  const navigate = useNavigate();
+
+  const storeData = async (selectedCaption: string) => {
+    const productId = localStorage.getItem("productId");
+    console.log(productId);
+
+    const data = localStorage.getItem("postContents");
+    if (!data) return;
+    const parsed = JSON.parse(data);
+    console.log("seo : ", parsed?.seo_tags);
+    console.log("hashtags : ", parsed?.hashtags);
+
+    try {
+      const response = await axios.post(
+        "https://genai-exchange-llm-api-3.onrender.com/store_caption_hashtags_seo",
+        {
+          product_id: productId,
+          seo_tags: parsed?.seo_tags,
+          hashtags: parsed?.hashtags,
+          caption: selectedCaption,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("✅ Description storage success:", response.data);
+
+      console.log("Description storage", response.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
     // Read from localStorage
@@ -67,10 +105,12 @@ export default function PreviewPage({
       <div className="flex items-center justify-between p-3 border-b border-gray-100">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-sm font-semibold">U</span>
+            <span className="text-white text-sm font-semibold">
+              {user?.fullName?.charAt(0)}
+            </span>
           </div>
           <div>
-            <div className="font-semibold text-sm">Adarsh Thakare</div>
+            <div className="font-semibold text-sm">{user?.fullName}</div>
             <div className="text-xs text-gray-500">{location}</div>
           </div>
         </div>
@@ -109,7 +149,7 @@ export default function PreviewPage({
         <div className="text-sm font-semibold mb-2">1,234 likes</div>
 
         <div className="text-sm">
-          <span className="font-semibold">Adarsh Thakare</span>{" "}
+          <span className="font-semibold">{user?.fullName}</span>{" "}
           {selectedCaption || "Select a caption to preview here"}
         </div>
 
@@ -129,10 +169,12 @@ export default function PreviewPage({
       <div className="p-3">
         <div className="flex items-center space-x-3 mb-3">
           <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-            <span className="text-white font-semibold">U</span>
+            <span className="text-white font-semibold">
+              {user?.fullName?.charAt(0)}
+            </span>
           </div>
           <div className="flex-1">
-            <div className="font-semibold text-sm">Adarsh Thakare</div>
+            <div className="font-semibold text-sm">{user?.fullName}</div>
             <div className="text-xs text-gray-500 flex items-center">
               2h · <Globe className="w-3 h-3 ml-1" />
             </div>
@@ -384,7 +426,7 @@ export default function PreviewPage({
 
           {/* Phone Mockup */}
           <motion.div
-            className="bg-black rounded-[2.5rem] shadow-2xl border-8 border-gray-900 relative w-[320px] h-[640px] flex flex-col"
+            className="bg-black rounded-[2.5rem] shadow-2xl border-8 border-gray-900 relative w-[420px] h-[720px] flex flex-col"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4 }}
@@ -425,6 +467,11 @@ export default function PreviewPage({
               </div>
             </div>
           </motion.div>
+          <div className="border-2 mt-3 border-dotted border-gray-400 rounded-lg p-6 text-center">
+            <p className="text-gray-600 font-medium">
+              Stay Tuned for Automatic Post Scheduling
+            </p>
+          </div>
         </div>
       </div>
 
@@ -434,11 +481,14 @@ export default function PreviewPage({
           <ArrowLeft className="h-4 w-4 mr-2" /> Back
         </Button>
         <Button
-          onClick={() => onSubmit(selectedCaption)}
+          onClick={() => {
+            storeData(selectedCaption);
+            navigate("/dashboard");
+          }}
           disabled={!selectedCaption}
           className="bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600"
         >
-          Post
+          Save Product
         </Button>
       </div>
     </motion.div>
