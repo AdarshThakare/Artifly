@@ -12,6 +12,7 @@ import {
   Calendar,
   MapPin,
   Tag,
+  Loader2, // ✅ Loader icon
 } from "lucide-react";
 import { Footer } from "../components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/Card";
@@ -49,10 +50,12 @@ export const createProduct = async () => {
 export default function DashboardPage() {
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true); // ✅ loading state
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true); // show loader before fetch
         const response = await axios.get(
           "https://genai-exchange-llm-api-3.onrender.com/products",
           {
@@ -63,9 +66,10 @@ export default function DashboardPage() {
         );
         console.log("✅ Array of products:", response.data.products);
         setProducts(response.data.products);
-        console.log("Description storage", response.data);
       } catch (err) {
         console.log(err);
+      } finally {
+        setLoading(false); // hide loader after fetch
       }
     };
     fetchData();
@@ -215,38 +219,15 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle>
                 <span>Your Products ({products.length})</span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    createProduct();
-                    navigate("/onboarding");
-                  }}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Product
-                </Button>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {products.length === 0 ? (
-                <div className="text-center py-12">
-                  <ImageIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    No products yet
-                  </h3>
-                  <p className="text-gray-500 mb-6">
-                    Get started by uploading your first craft!
-                  </p>
-                  <Button
-                    onClick={() => {
-                      createProduct();
-                      navigate("/onboarding");
-                    }}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Upload Your First Product
-                  </Button>
+              {loading ? (
+                <div className="flex justify-center items-center py-12">
+                  <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+                  <span className="ml-3 text-gray-600 text-sm">
+                    Loading products...
+                  </span>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
