@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Menu, X, Palette } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useUser, UserButton, SignInButton } from "@clerk/clerk-react";
+import { createProduct } from "../screens/Dashboard";
 
 const Button: React.FC<
   React.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -33,7 +34,7 @@ export function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <Palette className="h-8 w-8 text-primary" />
+            <img src="logo.png" alt="" className="size-7 rounded-full" />{" "}
             <span className="text-xl font-bold text-foreground">ARTIFLY</span>
           </Link>
 
@@ -45,6 +46,7 @@ export function Navbar() {
             <Link
               to="/onboarding"
               className="text-foreground hover:text-primary"
+              onClick={() => createProduct()}
             >
               Get Started
             </Link>

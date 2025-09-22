@@ -246,7 +246,10 @@ export default function Step2Story({
                 {[typedText, ...aiDescriptions].map((t, idx) => (
                   <motion.button
                     key={idx}
-                    onClick={() => setSelectedDescription(t)}
+                    onClick={() => {
+                      setSelectedDescription(t);
+                      generateTagsAndCaption();
+                    }}
                     whileTap={{ scale: 0.97 }}
                     className={`w-full text-left px-4 my-2 hover:border-2! hover:border-sky-500! py-2 rounded-xl border transition ${
                       selectedDescription === t

@@ -79,7 +79,7 @@ export default function PreviewPage({
     const storedTitle = localStorage.getItem("userTitle");
     const storedCategory = localStorage.getItem("category");
     const storedLocation = localStorage.getItem("location");
-    const storedImage = localStorage.getItem("imageBase64");
+    const storedImage = localStorage.getItem("ImageBase64");
 
     if (storedPostContents) {
       const parsed = JSON.parse(storedPostContents);
@@ -96,7 +96,13 @@ export default function PreviewPage({
     if (storedTitle) setTitle(storedTitle);
     if (storedCategory) setCategory(storedCategory);
     if (storedLocation) setLocation(storedLocation);
-    if (storedImage) setImageBase64(storedImage);
+    // ✅ Validate before setting
+    if (storedImage && storedImage.startsWith("data:image/")) {
+      setImageBase64(storedImage);
+      console.log(storedImage);
+    } else {
+      console.warn("⚠️ No valid imageBase64 found in localStorage");
+    }
   }, []);
 
   const InstagramPost = () => (
