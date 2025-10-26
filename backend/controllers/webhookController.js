@@ -6,34 +6,27 @@ export const webhookController = async (req, res) => {
   const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
 
   if (!WEBHOOK_SECRET) {
-    throw new Error(
-      "Please add WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local"
-    );
+    console.error("WEBHOOK_SECRET missing");
+    return res.status(500).send("Server misconfigured");
   }
 
-  // Get the headers
-  const headerPayload = headers();
-  const svix_id = headerPayload.get("svix-id");
-  const svix_timestamp = headerPayload.get("svix-timestamp");
-  const svix_signature = headerPayload.get("svix-signature");
+  //  Get headers from Express request
+  const svix_id = req.headers["svix-id"];
+  const svix_timestamp = req.headers["svix-timestamp"];
+  const svix_signature = req.headers["svix-signature"];
 
-  // If there are no headers, error out
+  // Validate headers
   if (!svix_id || !svix_timestamp || !svix_signature) {
-    return new Response("Error occured -- no svix headers", {
-      status: 400,
-    });
+    return res.status(400).send("Missing Svix headers");
   }
 
-  // Get the body
-  const payload = await req.json();
+  //  Get raw body (IMPORTANT for Svix verification)
+  const payload = req.body; // ensure body-parser is not converting to object
   const body = JSON.stringify(payload);
 
-  // Create a new Svix instance with your secret.
   const wh = new Webhook(WEBHOOK_SECRET);
 
   let evt;
-
-  // Verify the payload with the headers
   try {
     evt = wh.verify(body, {
       "svix-id": svix_id,
@@ -41,49 +34,30 @@ export const webhookController = async (req, res) => {
       "svix-signature": svix_signature,
     });
   } catch (err) {
-    console.error("Error verifying webhook:", err);
-    return new Response("Error occured", {
-      status: 400,
-    });
+    console.error(" Error verifying webhook:", err);
+    return res.status(400).send("Invalid signature");
   }
 
-  // Do something with the payload
-  // For this guide, you simply log the payload to the console
-  const { id } = evt?.data;
-  const eventType = evt?.type;
-  console.log(`Webhook with and ID of ${id} and type of ${eventType}`);
-  console.log("Webhook body:", body);
+  const eventType = evt.type;
+  const data = evt.data;
 
-  if (eventType === "user.created" || eventType === "user.updated") {
-    const { id, first_name, last_name, image_url, email_addresses, username } =
-      evt?.data;
-    try {
-      if (user && eventType === "user.created") {
-        try {
-          console.log("User created:", id);
-        } catch (error) {
-          console.log("Error updating user metadata:", error);
-        }
-      }
-    } catch (error) {
-      console.log("Error creating or updating user:", error);
-      return new Response("Error occured", {
-        status: 400,
-      });
+  console.log(` Webhook received: ${eventType}`, data);
+
+  try {
+    if (eventType === "user.created") {
+      console.log("User created:", data.id);
+      // Add logic to store user in DB
+    } else if (eventType === "user.updated") {
+      console.log("User updated:", data.id);
+      // Add logic to update user in DB
+    } else if (eventType === "user.deleted") {
+      console.log("User deleted:", data.id);
+      // Add logic to delete user in DB
     }
+  } catch (error) {
+    console.error("Error handling webhook event:", error);
+    return res.status(500).send("Internal error handling event");
   }
 
-  if (eventType === "user.deleted") {
-    const { id } = evt?.data;
-    try {
-      console.log("User deleted:", id);
-    } catch (error) {
-      console.log("Error deleting user:", error);
-      return new Response("Error occured", {
-        status: 400,
-      });
-    }
-  }
-
-  return new Response("Webhook is called", { status: 200 });
+  return res.status(200).send("Webhook processed successfully");
 };
