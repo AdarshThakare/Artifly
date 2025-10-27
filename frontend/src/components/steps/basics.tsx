@@ -151,27 +151,7 @@ export default function Step1Basics({
   const isNextDisabled = !selectedTitle || !location.trim();
 
   const storePrimitives = async () => {
-    const productId = localStorage.getItem("productId");
-    console.log(productId);
-
     try {
-      const response = await axios.post(
-        "https://genai-exchange-llm-api-3.onrender.com/store_name_category_location",
-        {
-          product_id: productId,
-          name: selectedTitle,
-          category: selectedCategory,
-          location: location,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("✅ Primitive storage success:", response.data);
-
-      console.log("Primitive storage", response.data);
     } catch (err) {
       console.log(err);
     }
@@ -182,21 +162,6 @@ export default function Step1Basics({
     console.log(productId);
 
     try {
-      const response = await axios.post(
-        "https://genai-exchange-llm-api-3.onrender.com/store_title",
-        {
-          product_id: productId,
-          title: title,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("✅ Title storage success:", response.data);
-
-      console.log("Title storage", response.data);
     } catch (err) {
       console.log(err);
     }

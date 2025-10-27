@@ -43,26 +43,7 @@ export default function Step2Story({
   }
 
   const storeData = async (story: string) => {
-    const productId = localStorage.getItem("productId");
-    console.log(productId);
-    console.log(story);
-
     try {
-      const response = await axios.post(
-        "https://genai-exchange-llm-api-3.onrender.com/store_story",
-        {
-          product_id: productId,
-          story: story,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("✅ Description storage success:", response.data);
-
-      console.log("Description storage", response.data);
     } catch (err) {
       console.log(err);
     }
@@ -117,25 +98,7 @@ export default function Step2Story({
   };
 
   const storeDescription = async () => {
-    const productId = localStorage.getItem("productId");
-    console.log(productId);
-
     try {
-      const response = await axios.post(
-        "https://genai-exchange-llm-api-3.onrender.com/store_description",
-        {
-          product_id: productId,
-          description: typedText,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("✅ Story storage success:", response.data);
-
-      console.log("Story storage", response.data);
     } catch (err) {
       console.log(err);
     }

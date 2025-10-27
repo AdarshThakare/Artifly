@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useUser, UserButton, SignInButton } from "@clerk/clerk-react";
-import { createProduct } from "../screens/Dashboard";
 
 const Button: React.FC<
   React.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -46,7 +45,6 @@ export function Navbar() {
             <Link
               to="/onboarding"
               className="text-foreground hover:text-primary"
-              onClick={() => createProduct()}
             >
               Get Started
             </Link>
@@ -97,6 +95,7 @@ export function Navbar() {
               >
                 Get Started
               </Link>
+
               {isSignedIn && (
                 <Link
                   to="/dashboard"
@@ -106,6 +105,7 @@ export function Navbar() {
                   Dashboard
                 </Link>
               )}
+
               {!isSignedIn ? (
                 <SignInButton mode="modal">
                   <Button variant="default" className="w-full">

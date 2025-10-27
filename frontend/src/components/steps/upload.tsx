@@ -59,27 +59,9 @@ export default function Step3Upload({
   };
 
   const storeSelectedImage = async (image: string) => {
-    const productId = localStorage.getItem("productId");
-    console.log(productId);
-
     const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
 
     try {
-      const response = await axios.post(
-        "https://genai-exchange-llm-api-3.onrender.com/store_image",
-        {
-          product_id: productId,
-          image_base64: base64Data,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("✅ Image storage success:", response.data);
-
-      console.log("Image storage", response.data);
     } catch (err) {
       console.log(err);
     }
@@ -211,7 +193,7 @@ export default function Step3Upload({
 
                   {/* Image Selection Grid */}
                   <div className="grid grid-cols-2 space-y-2">
-                    {allImages.map((imageUrl, index) => (
+                    {allImages && allImages.map((imageUrl, index) => (
                       <div key={imageUrl} className="relative mx-2">
                         <button
                           onClick={() => handleImageSelect(imageUrl)}

@@ -17,7 +17,6 @@ import { useNavigate } from "react-router-dom";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { BsStars } from "react-icons/bs";
 import { RiShoppingBag4Line } from "react-icons/ri";
-import { createProduct } from "./Dashboard";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -382,7 +381,6 @@ export default function HomePage() {
             size="lg"
             variant="default"
             onClick={() => {
-              createProduct();
               navigate("/onboarding");
             }}
             className="text-xl 2xl:text-2xl! mt-8 bg-accent-foreground! px-8 py-6 hover:px-10 hover:border-accent transition-all duration-300"

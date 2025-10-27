@@ -41,33 +41,7 @@ export default function PreviewPage({
   const navigate = useNavigate();
 
   const storeData = async (selectedCaption: string) => {
-    const productId = localStorage.getItem("productId");
-    console.log(productId);
-
-    const data = localStorage.getItem("postContents");
-    if (!data) return;
-    const parsed = JSON.parse(data);
-    console.log("seo : ", parsed?.seo_tags);
-    console.log("hashtags : ", parsed?.hashtags);
-
     try {
-      const response = await axios.post(
-        "https://genai-exchange-llm-api-3.onrender.com/store_caption_hashtags_seo",
-        {
-          product_id: productId,
-          seo_tags: parsed?.seo_tags,
-          hashtags: parsed?.hashtags,
-          caption: selectedCaption,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("✅ Description storage success:", response.data);
-
-      console.log("Description storage", response.data);
     } catch (err) {
       console.log(err);
     }
