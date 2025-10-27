@@ -64,6 +64,6 @@ const socialPostSchema = new mongoose.Schema(
   }
 );
 
-const socialPost =
+const SocialPost =
   mongoose.models.Product || mongoose.model("Product", socialPostSchema);
-export default socialPost;
+export default SocialPost;

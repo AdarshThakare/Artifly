@@ -1,6 +1,6 @@
 import { Webhook } from "svix";
 import dotenv from "dotenv";
-import User from "../models/user.js"; // adjust the import path
+import User from "../models/user.js";
 dotenv.config();
 
 export const webhookController = async (req, res) => {

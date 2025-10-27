@@ -1,5 +1,5 @@
-import SocialPost from "../models/socialPost.model.js"; // adjust import path
-import User from "../models/user.model.js";
+import SocialPost from "../models/socialPost.js";
+import User from "../models/user.js";
 
 export const createSocialPost = async (req, res) => {
   try {
@@ -78,9 +78,6 @@ export const storeImage = async (req, res) => {
     res.status(500).json({ error: "Server error while storing image" });
   }
 };
-
-import SocialPost from "../models/socialPost.model.js";
-import User from "../models/user.model.js";
 
 export const getAllSocialPosts = async (req, res) => {
   try {

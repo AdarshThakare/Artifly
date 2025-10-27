@@ -1,4 +1,4 @@
-import User from "../models/user.model.js";
+import User from "../models/user.js";
 
 export const updateLocationAndCategoryForUser = async (req, res) => {
   const { clerkId } = req.params;
