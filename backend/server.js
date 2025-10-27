@@ -4,6 +4,8 @@ import cookieParser from "cookie-parser";
 import "dotenv/config";
 import { connectDB } from "./lib/db.js";
 import webhookRoute from "./routes/webhookRoute.js";
+import socialPostRoute from "./routes/socialPost.js";
+import userRoute from "./routes/userRoute.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,6 +15,8 @@ app.use(cookieParser());
 app.use(cors());
 
 app.use("/api/v1/webhook", webhookRoute);
+app.use("/api/v1/socials", socialPostRoute);
+app.use("/api/v1/user", userRoute);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
