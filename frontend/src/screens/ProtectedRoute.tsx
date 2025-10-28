@@ -1,5 +1,5 @@
 // src/components/ProtectedRoute.jsx
-import React, { type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useUser, SignIn } from "@clerk/clerk-react";
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {

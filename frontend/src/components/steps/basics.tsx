@@ -13,6 +13,7 @@ import {
   Loader2,
 } from "lucide-react";
 import axios from "axios";
+import { useUser } from "@clerk/clerk-react";
 
 interface Step1Props {
   direction: "forward" | "backward";
@@ -38,6 +39,12 @@ export default function Step1Basics({
   const [location, setLocation] = useState("");
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationError, setLocationError] = useState("");
+
+  const { user } = useUser();
+  const clerkId = user?.id;
+
+  if (clerkId) localStorage.setItem("clerkId", clerkId);
+  const clerk_id = localStorage.getItem("clerkId");
 
   // Function to get user's location using GPS
   const getUserLocation = async () => {
@@ -150,18 +157,86 @@ export default function Step1Basics({
 
   const isNextDisabled = !selectedTitle || !location.trim();
 
+  async function uploadBase64ToCloudinary(base64String: string) {
+    const formData = new FormData();
+    formData.append("file", base64String);
+    formData.append("upload_preset", "au2ty08i"); // make sure this preset exists and is unsigned
+
+    const response = await fetch(
+      "https://api.cloudinary.com/v1_1/dyjl9bwpv/image/upload",
+      {
+        method: "POST",
+        body: formData, // ✅ no need for headers
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("Cloudinary error:", data);
+      throw new Error(data.error?.message || "Cloudinary upload failed");
+    }
+
+    return data.secure_url;
+  }
+
+  const storeSelectedImage = async (image: string) => {
+    try {
+      const imageUrl = await uploadBase64ToCloudinary(image);
+      const postId = localStorage.getItem("postId");
+      // now send to backend to store the image URL
+      await fetch("http://localhost:3000/api/v1/post/store-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ postId: postId, imageUrl }),
+      });
+    } catch (err) {
+      console.error("Upload failed:", err);
+    }
+  };
+
   const storePrimitives = async () => {
     try {
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/post/",
+        {
+          clerkId: clerk_id,
+          name: selectedTitle,
+          category: selectedCategory,
+          location: location,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("✅ Primitive storage success:", response.data.data);
+
+      localStorage.setItem("postId", response.data.data._id);
+
+      console.log("Primitive storage", response.data);
     } catch (err) {
       console.log(err);
     }
   };
 
   const storeData = async (title: string) => {
-    const productId = localStorage.getItem("productId");
-    console.log(productId);
-
     try {
+      const postId = localStorage.getItem("postId");
+
+      const response = await axios.post(
+        `http://localhost:3000/api/v1/post/store-title/${postId}`,
+        {
+          title: title,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("✅ Title storage success:", response.data);
     } catch (err) {
       console.log(err);
     }
@@ -332,10 +407,12 @@ export default function Step1Basics({
         <div className="flex justify-end mt-8">
           <motion.div whileHover={{ scale: 1.05 }}>
             <Button
-              onClick={() => {
+              onClick={async () => {
                 localStorage.setItem("userTitle", selectedTitle);
-                storePrimitives();
-                storeData(selectedTitle);
+                const image = localStorage.getItem("ImageBase64");
+                await storePrimitives();
+                await storeData(selectedTitle);
+                if (image) await storeSelectedImage(image);
                 onNext();
               }}
               disabled={isNextDisabled}

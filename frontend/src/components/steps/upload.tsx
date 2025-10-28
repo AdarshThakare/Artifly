@@ -58,15 +58,6 @@ export default function Step3Upload({
     }
   };
 
-  const storeSelectedImage = async (image: string) => {
-    const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
-
-    try {
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   const imageUrlToBase64 = (url: string): Promise<string> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -254,8 +245,6 @@ export default function Step3Upload({
                 : "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300!"
             } transition-all duration-200`}
             onClick={() => {
-              const image = localStorage.getItem("ImageBase64");
-              if (image) storeSelectedImage(image);
               onNext();
             }}
           >

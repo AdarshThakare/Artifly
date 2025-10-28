@@ -43,7 +43,22 @@ export default function Step2Story({
   }
 
   const storeData = async (story: string) => {
+    const postId = localStorage.getItem("postId");
     try {
+      const response = await axios.post(
+        `http://localhost:3000/api/v1/post/store-description/${postId}`,
+        {
+          story: story,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("✅ Story storage success:", response.data);
+
+      console.log("Story storage", response.data);
     } catch (err) {
       console.log(err);
     }
@@ -98,7 +113,22 @@ export default function Step2Story({
   };
 
   const storeDescription = async () => {
+    const postId = localStorage.getItem("postId");
     try {
+      const response = await axios.post(
+        `http://localhost:3000/api/v1/post/store-description/${postId}`,
+        {
+          description: typedText,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("✅ Description storage success:", response.data);
+
+      console.log("Description storage", response.data);
     } catch (err) {
       console.log(err);
     }
@@ -234,14 +264,14 @@ export default function Step2Story({
           </Button>
 
           <Button
-            onClick={() => {
+            onClick={async () => {
               const finalStory = selectedDescription;
               if (finalStory) {
                 localStorage.setItem("story", selectedDescription);
               }
-              storeDescription();
-              storeData(selectedDescription);
-              generateTagsAndCaption();
+              await storeDescription();
+              await storeData(selectedDescription);
+              await generateTagsAndCaption();
               console.log("User's story:", finalStory);
               onNext();
             }}

@@ -41,7 +41,29 @@ export default function PreviewPage({
   const navigate = useNavigate();
 
   const storeData = async (selectedCaption: string) => {
+    const postId = localStorage.getItem("postId");
+
+    const data = localStorage.getItem("postContents");
+    if (!data) return;
+    const parsed = JSON.parse(data);
+    console.log("seo : ", parsed?.seo_tags);
+    console.log("hashtags : ", parsed?.hashtags);
+
     try {
+      const response = await axios.put(
+        `http://localhost:3000/api/v1/post/${postId}`,
+        {
+          seo_tags: parsed?.seo_tags,
+          hashtags: parsed?.hashtags,
+          caption: selectedCaption,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("✅ Caption, seo, hashtags storage success:", response.data);
     } catch (err) {
       console.log(err);
     }
@@ -461,8 +483,8 @@ export default function PreviewPage({
           <ArrowLeft className="h-4 w-4 mr-2" /> Back
         </Button>
         <Button
-          onClick={() => {
-            storeData(selectedCaption);
+          onClick={async () => {
+            await storeData(selectedCaption);
             navigate("/dashboard");
           }}
           disabled={!selectedCaption}

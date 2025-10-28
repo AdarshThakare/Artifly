@@ -1,3 +1,4 @@
+import cloudinary from "../lib/cloudinary.js";
 import SocialPost from "../models/socialPost.js";
 import User from "../models/user.js";
 
@@ -58,21 +59,25 @@ export const storeStory = async (req, res) => {
   await updateSocialPost(req, res);
 };
 
+export const storeDescription = async (req, res) => {
+  await updateSocialPost(req, res);
+};
+
 export const storeImage = async (req, res) => {
   try {
-    const { postId, imageBase64 } = req.body;
+    const { postId, imageUrl } = req.body;
 
-    if (!imageBase64) {
-      return res.status(400).json({ error: "Missing image data" });
+    if (!imageUrl) {
+      return res.status(400).json({ error: "Missing image URL" });
     }
 
     const post = await SocialPost.findById(postId);
     if (!post) return res.status(404).json({ error: "Post not found" });
 
-    post.images.push(imageBase64);
+    post.images.push(imageUrl);
     await post.save();
 
-    res.status(200).json({ message: "Image added", data: post });
+    res.status(200).json({ message: "Image URL saved", data: post });
   } catch (error) {
     console.error("Error storing image:", error);
     res.status(500).json({ error: "Server error while storing image" });
