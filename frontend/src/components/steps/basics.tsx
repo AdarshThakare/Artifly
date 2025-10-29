@@ -11,7 +11,8 @@ import {
   Sparkles,
   MapPin,
   Loader2,
-} from "lucide-react";
+  Volume2,
+} from "lucide-react"; // ✅ added Volume2 icon for TTS
 import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
 
@@ -46,6 +47,20 @@ export default function Step1Basics({
   if (clerkId) localStorage.setItem("clerkId", clerkId);
   const clerk_id = localStorage.getItem("clerkId");
 
+  // ✅ Text-to-Speech helper
+  const speak = (text: string) => {
+    if (!window.speechSynthesis) {
+      alert("Sorry, your browser does not support text-to-speech.");
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-IN"; // Indian English accent
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    window.speechSynthesis.cancel(); // stop ongoing speech
+    window.speechSynthesis.speak(utterance);
+  };
+
   // Function to get user's location using GPS
   const getUserLocation = async () => {
     setLocationLoading(true);
@@ -76,7 +91,6 @@ export default function Step1Basics({
                 `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
             );
           } else {
-            // Fallback to coordinates if geocoding fails
             setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
           }
         } catch (error) {
@@ -108,11 +122,11 @@ export default function Step1Basics({
       {
         enableHighAccuracy: true,
         timeout: 15000,
-        maximumAge: 6000000, // 10 minutes
+        maximumAge: 6000000,
       }
     );
   };
-  // Get location on component mount
+
   useEffect(() => {
     getUserLocation();
   }, []);
@@ -125,7 +139,6 @@ export default function Step1Basics({
     localStorage.setItem("category", selectedCategory);
 
     try {
-      // Create FormData and append required fields
       const formData = new FormData();
       formData.append("user_title", title);
       formData.append("location", location);
@@ -136,7 +149,7 @@ export default function Step1Basics({
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data", // required for FormData
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -160,13 +173,13 @@ export default function Step1Basics({
   async function uploadBase64ToCloudinary(base64String: string) {
     const formData = new FormData();
     formData.append("file", base64String);
-    formData.append("upload_preset", "au2ty08i"); // make sure this preset exists and is unsigned
+    formData.append("upload_preset", "au2ty08i");
 
     const response = await fetch(
       "https://api.cloudinary.com/v1_1/dyjl9bwpv/image/upload",
       {
         method: "POST",
-        body: formData, // ✅ no need for headers
+        body: formData,
       }
     );
 
@@ -184,7 +197,6 @@ export default function Step1Basics({
     try {
       const imageUrl = await uploadBase64ToCloudinary(image);
       const postId = localStorage.getItem("postId");
-      // now send to backend to store the image URL
       await fetch("http://localhost:3000/api/v1/post/store-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -206,16 +218,11 @@ export default function Step1Basics({
           location: location,
         },
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         }
       );
       console.log("✅ Primitive storage success:", response.data.data);
-
       localStorage.setItem("postId", response.data.data._id);
-
-      console.log("Primitive storage", response.data);
     } catch (err) {
       console.log(err);
     }
@@ -224,17 +231,10 @@ export default function Step1Basics({
   const storeData = async (title: string) => {
     try {
       const postId = localStorage.getItem("postId");
-
       const response = await axios.post(
         `http://localhost:3000/api/v1/post/store-title/${postId}`,
-        {
-          title: title,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        { title: title },
+        { headers: { "Content-Type": "application/json" } }
       );
       console.log("✅ Title storage success:", response.data);
     } catch (err) {
@@ -249,19 +249,25 @@ export default function Step1Basics({
       initial={{ x: direction === "forward" ? 80 : -80, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: direction === "forward" ? -80 : 80, opacity: 0 }}
-      className=" w-full"
+      className="w-full"
     >
       <Card className="backdrop-blur-md bg-white/80 dark:bg-gray-900/70 shadow-xl rounded-2xl p-6 border border-gray-200 dark:border-gray-800">
         <h2 className="font-bold text-3xl mb-6 flex items-center gap-2 font-outfit! tracking-wide">
-          <Palette className="h-6 w-6 text-blue-600 " /> Product Basic
+          <Palette className="h-6 w-6 text-blue-600" /> Product Basic
           Information
         </h2>
+
         <div className="space-y-6">
           {/* Product Name */}
           <div>
-            <p className="text-xl text-gray-600 font-semibold mb-2">
-              Product Name
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-xl text-gray-600 font-semibold mb-2">
+                Product Name
+              </p>
+              <button onClick={() => speak("Enter the name of your product.")}>
+                <Volume2 className="h-5 w-5 text-gray-500 hover:text-blue-600 transition" />
+              </button>
+            </div>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -269,14 +275,24 @@ export default function Step1Basics({
               icon={<Mic className="h-5 w-5 text-gray-400" />}
               className="text-lg py-2"
             />
-            <p className="text-xl font-light my-2 text-cyan-700 ">
-              AI suggestion - {aiName}
-            </p>
+            <div className="flex items-center gap-2 my-2">
+              <p className="text-xl font-light text-cyan-700">
+                AI suggestion - {aiName}
+              </p>
+              <button onClick={() => speak(`AI suggestion: ${aiName}`)}>
+                <Volume2 className="h-5 w-5 text-gray-500 hover:text-blue-600 transition" />
+              </button>
+            </div>
           </div>
 
           {/* Category */}
           <div>
-            <p className="text-xl font-semibold mb-2">Category</p>
+            <div className="flex items-center gap-2">
+              <p className="text-xl font-semibold mb-2">Category</p>
+              <button onClick={() => speak("Select your product category.")}>
+                <Volume2 className="h-5 w-5 text-gray-500 hover:text-blue-600 transition" />
+              </button>
+            </div>
             <Select
               value={selectedCategory}
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
@@ -292,15 +308,35 @@ export default function Step1Basics({
               ]}
               className="text-lg py-2"
             />
-            <p className="text-xl font-light my-2 text-cyan-700 ">
-              AI suggestion -{" "}
-              {aiCategory.charAt(0).toUpperCase() + aiCategory.slice(1)}
-            </p>
+            <div className="flex items-center gap-2 my-2">
+              <p className="text-xl font-light text-cyan-700">
+                AI suggestion -{" "}
+                {aiCategory.charAt(0).toUpperCase() + aiCategory.slice(1)}
+              </p>
+              <button
+                onClick={() =>
+                  speak(
+                    `AI suggests category: ${
+                      aiCategory.charAt(0).toUpperCase() + aiCategory.slice(1)
+                    }`
+                  )
+                }
+              >
+                <Volume2 className="h-5 w-5 text-gray-500 hover:text-blue-600 transition" />
+              </button>
+            </div>
           </div>
 
           {/* Location Field */}
           <div>
-            <p className="text-xl text-gray-600 font-semibold mb-2">Location</p>
+            <div className="flex items-center gap-2">
+              <p className="text-xl text-gray-600 font-semibold mb-2">
+                Location
+              </p>
+              <button onClick={() => speak("Enter or detect your location.")}>
+                <Volume2 className="h-5 w-5 text-gray-500 hover:text-blue-600 transition" />
+              </button>
+            </div>
             <div className="relative">
               <Input
                 value={location}
@@ -335,25 +371,6 @@ export default function Step1Basics({
               </p>
             )}
           </div>
-
-          {/* Conditionally show 'Other' input */}
-          <AnimatePresence>
-            {selectedCategory === "other" && (
-              <motion.div
-                key="other-input"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-              >
-                <p className="text-lg font-light mb-2">Specify Your Category</p>
-                <Input
-                  placeholder="Enter your category"
-                  className="text-lg py-2"
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
 
         {/* Generate AI Titles */}
@@ -380,9 +397,16 @@ export default function Step1Basics({
               transition={{ duration: 0.3 }}
               className="space-y-3"
             >
-              <p className="text-lg mt-6 font-medium text-gray-700 dark:text-gray-300">
-                Choose Your Title:
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="text-lg mt-6 font-medium text-gray-700 dark:text-gray-300">
+                  Choose Your Title:
+                </p>
+                <button
+                  onClick={() => speak("Choose one title from the list.")}
+                >
+                  <Volume2 className="h-5 w-5 text-gray-500 hover:text-blue-600 transition" />
+                </button>
+              </div>
               <div className="grid gap-3">
                 {[title, ...aiTitles].map((t, idx) => (
                   <motion.button
@@ -408,12 +432,18 @@ export default function Step1Basics({
           <motion.div whileHover={{ scale: 1.05 }}>
             <Button
               onClick={async () => {
-                localStorage.setItem("userTitle", selectedTitle);
-                const image = localStorage.getItem("ImageBase64");
-                await storePrimitives();
-                await storeData(selectedTitle);
-                if (image) await storeSelectedImage(image);
                 onNext();
+                localStorage.setItem("userTitle", selectedTitle);
+                (async () => {
+                  try {
+                    const image = localStorage.getItem("ImageBase64");
+                    await storePrimitives();
+                    await storeData(selectedTitle);
+                    if (image) await storeSelectedImage(image);
+                  } catch (err) {
+                    console.error("Background save failed:", err);
+                  }
+                })();
               }}
               disabled={isNextDisabled}
               className={`flex items-center gap-2 ${

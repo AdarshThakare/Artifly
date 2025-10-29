@@ -484,8 +484,16 @@ export default function PreviewPage({
         </Button>
         <Button
           onClick={async () => {
-            await storeData(selectedCaption);
             navigate("/dashboard");
+
+            (async () => {
+              try {
+                await storeData(selectedCaption);
+                console.log("Caption stored successfully");
+              } catch (err) {
+                console.error("Error storing caption:", err);
+              }
+            })();
           }}
           disabled={!selectedCaption}
           className="bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600"

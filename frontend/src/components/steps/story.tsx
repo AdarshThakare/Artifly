@@ -266,14 +266,21 @@ export default function Step2Story({
           <Button
             onClick={async () => {
               const finalStory = selectedDescription;
+
               if (finalStory) {
-                localStorage.setItem("story", selectedDescription);
+                localStorage.setItem("story", finalStory);
               }
-              await storeDescription();
-              await storeData(selectedDescription);
-              await generateTagsAndCaption();
-              console.log("User's story:", finalStory);
               onNext();
+              (async () => {
+                try {
+                  await storeDescription();
+                  await storeData(finalStory);
+                  await generateTagsAndCaption();
+                  console.log("User's story:", finalStory);
+                } catch (err) {
+                  console.error("Background story upload failed:", err);
+                }
+              })();
             }}
           >
             Next
