@@ -46,7 +46,7 @@ export default function Step2Story({
     const postId = localStorage.getItem("postId");
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/v1/post/store-description/${postId}`,
+        `https://artifly-backend.onrender.com/api/v1/post/store-description/${postId}`,
         {
           story: story,
         },
@@ -116,7 +116,7 @@ export default function Step2Story({
     const postId = localStorage.getItem("postId");
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/v1/post/store-description/${postId}`,
+        `https://artifly-backend.onrender.com/api/v1/post/store-description/${postId}`,
         {
           description: typedText,
         },
