@@ -53,7 +53,8 @@ const [loading, setLoading] = useState(false); // ✅ Add at top of component
 
     try {
       const response = await axios.put(
-        `http://localhost:3000/api/v1/post/${postId}`,
+        // `http://localhost:3000/api/v1/post/${postId}`,
+        `https://artifly-backend.onrender.com/api/v1/post/${postId}`,
         {
           seo_tags: parsed?.seo_tags,
           hashtags: parsed?.hashtags,
