@@ -193,6 +193,7 @@ export default function Step1Basics({
     return data.secure_url;
   }
 
+
   const storeSelectedImage = async (image: string) => {
     try {
       const imageUrl = await uploadBase64ToCloudinary(image);
