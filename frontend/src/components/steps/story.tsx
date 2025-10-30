@@ -236,7 +236,6 @@ export default function Step2Story({
                 Choose Your Enhanced Story-telling Description:
               </p>
               <div className="grid gap-3">
-               // Replace this section in your story.tsx:
 
 {[typedText, ...aiDescriptions].map((t, idx) => (
   <motion.button
