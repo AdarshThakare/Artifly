@@ -197,7 +197,8 @@ export default function Step1Basics({
     try {
       const imageUrl = await uploadBase64ToCloudinary(image);
       const postId = localStorage.getItem("postId");
-      await fetch("http://localhost:3000/api/v1/post/store-image", {
+      // await fetch("http://localhost:3000/api/v1/post/store-image", {
+      await fetch("https://artifly-backend.onrender.com/api/v1/post/store-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ postId: postId, imageUrl }),
@@ -210,7 +211,8 @@ export default function Step1Basics({
   const storePrimitives = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/v1/post/",
+        // "http://localhost:3000/api/v1/post/",
+        "https://artifly-backend.onrender.com/api/v1/post/",
         {
           clerkId: clerkId,
           name: selectedTitle,
@@ -232,7 +234,8 @@ export default function Step1Basics({
     try {
       const postId = localStorage.getItem("postId");
       const response = await axios.post(
-        `http://localhost:3000/api/v1/post/store-title/${postId}`,
+        // `http://localhost:3000/api/v1/post/store-title/${postId}`,
+        `https://artifly-backend.onrender.com/api/v1/post/store-title/${postId}`,
         { title: title },
         { headers: { "Content-Type": "application/json" } }
       );
