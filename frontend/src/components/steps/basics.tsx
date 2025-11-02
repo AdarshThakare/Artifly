@@ -311,19 +311,23 @@ export default function Step1Basics({
               className="text-lg py-2"
             />
             <div className="flex items-center gap-2 my-2">
-              <p className="text-xl font-light text-cyan-700">
-                AI suggestion -{" "}
-                {aiCategory.charAt(0).toUpperCase() + aiCategory.slice(1)}
-              </p>
-              <button
-                onClick={() =>
-                  speak(
-                    `AI suggests category: ${
-                      aiCategory.charAt(0).toUpperCase() + aiCategory.slice(1)
-                    }`
-                  )
-                }
-              >
+            <p className="text-xl font-light text-cyan-700">
+  AI suggestion -{" "}
+  {aiCategory
+    ? aiCategory.charAt(0).toUpperCase() + aiCategory.slice(1)
+    : "Loading..."}
+</p>
+<button
+  onClick={() =>
+    aiCategory &&
+    speak(
+      `AI suggests category: ${
+        aiCategory.charAt(0).toUpperCase() + aiCategory.slice(1)
+      }`
+    )
+  }
+>
+
                 <Volume2 className="h-5 w-5 text-gray-500 hover:text-blue-600 transition" />
               </button>
             </div>
