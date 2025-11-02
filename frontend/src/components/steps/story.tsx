@@ -64,53 +64,53 @@ export default function Step2Story({
     }
   };
 
-  const generateTagsAndCaption = async () => {
-    if (!typedText.trim()) {
-      alert("Please fill in the description first!");
-      return;
-    }
-    setLoading(true);
-    if (!image) {
-      console.log("Image not found!");
-      return;
-    }
+  // const generateTagsAndCaption = async () => {
+  //   if (!typedText.trim()) {
+  //     alert("Please fill in the description first!");
+  //     return;
+  //   }
+  //   setLoading(true);
+  //   if (!image) {
+  //     console.log("Image not found!");
+  //     return;
+  //   }
 
-    const file = base64ToFile(image, "product.png"); // Convert base64 to File
+  //   const file = base64ToFile(image, "product.png"); // Convert base64 to File
 
-    console.log("SELECTED", userTitle, location, category);
-    try {
-      const formData = new FormData();
-      if (userTitle && location && category) {
-        formData.append("image", file);
-        formData.append("title", userTitle);
-        formData.append("description", selectedDescription); //should be selected Description
-        formData.append("category", category);
-        formData.append("location", location);
-      }
+  //   console.log("SELECTED", userTitle, location, category);
+  //   try {
+  //     const formData = new FormData();
+  //     if (userTitle && location && category) {
+  //       formData.append("image", file);
+  //       formData.append("title", userTitle);
+  //       formData.append("description", selectedDescription); //should be selected Description
+  //       formData.append("category", category);
+  //       formData.append("location", location);
+  //     }
 
-      const res = await axios.post(
-        "https://genai-exchange-llm-api-3.onrender.com/gen-tags-captions",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+  //     const res = await axios.post(
+  //       "https://genai-exchange-llm-api-3.onrender.com/gen-tags-captions",
+  //       formData,
+  //       {
+  //         headers: {
+  //           "Content-Type": "multipart/form-data",
+  //         },
+  //       }
+  //     );
 
-      console.log("Response", res.data);
-      if (res.data.success) {
-        console.log("Captions, SEO tags and hashtags:", res.data.data);
-        localStorage.setItem("postContents", JSON.stringify(res.data.data));
-      } else {
-        console.error("Backend error:", res.data.message);
-      }
-    } catch (err) {
-      console.error("Error fetching AI titles:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     console.log("Response", res.data);
+  //     if (res.data.success) {
+  //       console.log("Captions, SEO tags and hashtags:", res.data.data);
+  //       localStorage.setItem("postContents", JSON.stringify(res.data.data));
+  //     } else {
+  //       console.error("Backend error:", res.data.message);
+  //     }
+  //   } catch (err) {
+  //     console.error("Error fetching AI titles:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const storeDescription = async () => {
     const postId = localStorage.getItem("postId");
