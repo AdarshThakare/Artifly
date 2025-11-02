@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Mic, MicOff, Play, Pause } from "lucide-react";
 
-// Simple Card replacement
+// Card & Button components as you already have
+
 const Card: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   children,
   className = "",
@@ -12,7 +13,6 @@ const Card: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   </div>
 );
 
-// Simple Button replacement
 const Button: React.FC<
   React.ButtonHTMLAttributes<HTMLButtonElement> & {
     variant?: "default" | "outline" | "destructive";
@@ -58,18 +58,48 @@ export function VoiceRecorder({
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const handleStartRecording = () => {
-    setIsRecording(true);
-    // Simulate recording - in real app, would use Web Speech API
-    setTimeout(() => {
-      const sampleTranscript =
-        "I've been crafting pottery for over 20 years. Each piece is hand-thrown on my wheel using local clay from the riverbank near my studio. This particular vase features a unique glaze technique I developed that creates these beautiful earth-tone patterns.";
-      onTranscriptChange(sampleTranscript);
-      setIsRecording(false);
-    }, 3000);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<BlobPart[]>([]);
+
+  const handleStartRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      let mimeType = "audio/webm";
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = "audio/webm;codecs=opus";
+      }
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = "audio/ogg;codecs=opus";
+      }
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = ""; // Let browser decide
+      }
+      const options = { mimeType: mimeType };
+      const mediaRecorder = new MediaRecorder(stream, options);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = async (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+          // send chunk to backend
+          await sendChunk(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        stream.getTracks().forEach((track) => track.stop());
+      };
+
+      mediaRecorder.start(1000); // collect every 1 second
+      setIsRecording(true);
+    } catch (err) {
+      console.error("Error accessing microphone:", err);
+    }
   };
 
   const handleStopRecording = () => {
+    mediaRecorderRef.current?.stop();
     setIsRecording(false);
   };
 
@@ -77,6 +107,28 @@ export function VoiceRecorder({
     setIsPlaying(!isPlaying);
     if (!isPlaying) {
       setTimeout(() => setIsPlaying(false), 2000);
+    }
+  };
+
+  const sendChunk = async (chunk: BlobPart) => {
+    const blob = new Blob([chunk], { type: "audio/webm" });
+    const arrayBuffer = await blob.arrayBuffer();
+    const uint8 = new Uint8Array(arrayBuffer);
+
+    try {
+      const response = await fetch("http://localhost:3000/api/v1/transcribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "audio/webm",
+        },
+        body: uint8,
+      });
+      const data = await response.json();
+      if (data.transcript) {
+        onTranscriptChange(transcript + " " + data.transcript);
+      }
+    } catch (err) {
+      console.error("Error sending chunk:", err);
     }
   };
 
@@ -93,7 +145,7 @@ export function VoiceRecorder({
         <div className="flex justify-center space-x-4">
           {!isRecording ? (
             <Button
-              onClick={handleStartRecording}
+              onClick={() => handleStartRecording()}
               size="lg"
               className="rounded-full"
             >
@@ -102,7 +154,7 @@ export function VoiceRecorder({
             </Button>
           ) : (
             <Button
-              onClick={handleStopRecording}
+              onClick={() => handleStopRecording()}
               variant="destructive"
               size="lg"
               className="rounded-full"
