@@ -249,87 +249,99 @@ export default function Step2Story({
                 Choose Your Enhanced Story-telling Description:
               </p>
               <div className="grid gap-3">
-                {[typedText, ...aiDescriptions].map((t, idx) => (
-                  <motion.button
-                    key={idx}
-                    onClick={async () => {
-                      setSelectedDescription(t);
-                      speak(t);
+               {[typedText, ...aiDescriptions].map((t, idx) => (
+  <motion.button
+    key={idx}
+    onClick={async () => {
+      console.log("🔘 Description clicked:", t);
+      
+      setSelectedDescription(t);
+      
+      if (!t || !t.trim()) {
+        alert("Description is empty!");
+        return;
+      }
+      
+      setLoading(true);
+      
+      const image = localStorage.getItem("ImageBase64");
+      const location = localStorage.getItem("location");
+      const category = localStorage.getItem("category");
+      const userTitle = localStorage.getItem("userTitle");
+      
+      if (!image) {
+        console.error("❌ Image not found!");
+        alert("Image is missing. Please go back.");
+        setLoading(false);
+        return;
+      }
 
-                      // ✅ FIX: Pass the description directly instead of using state
-                      if (!t.trim()) {
-                        alert("Please fill in the description first!");
-                        return;
-                      }
-                      setLoading(true);
+      console.log("📦 Sending data:", { userTitle, location, category, descriptionLength: t.length });
 
-                      if (!image) {
-                        console.log("Image not found!");
-                        setLoading(false);
-                        return;
-                      }
+      try {
+        const file = base64ToFile(image, "product.png");
+        
+        const formData = new FormData();
+        formData.append("image", file);
+        formData.append("title", userTitle || "");
+        formData.append("description", t);
+        formData.append("category", category || "");
+        formData.append("location", location || "");
 
-                      const file = base64ToFile(image, "product.png");
+        console.log("📤 Sending request to gen-tags-captions...");
 
-                      console.log("SELECTED", userTitle, location, category);
-                      console.log("Description being sent:", t); // ✅ Debug log
+        const res = await axios.post(
+          "https://genai-exchange-llm-api-3.onrender.com/gen-tags-captions",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
-                      try {
-                        const formData = new FormData();
-                        if (userTitle && location && category) {
-                          formData.append("image", file);
-                          formData.append("title", userTitle);
-                          formData.append("description", t); // ✅ Use 't' directly, not state
-                          formData.append("category", category);
-                          formData.append("location", location);
-                        }
-
-                        const res = await axios.post(
-                          "https://genai-exchange-llm-api-3.onrender.com/gen-tags-captions",
-                          formData,
-                          {
-                            headers: {
-                              "Content-Type": "multipart/form-data",
-                            },
-                          }
-                        );
-
-                        console.log("✅ AI Response:", res.data);
-                        if (res.data.success) {
-                          console.log(
-                            "Captions, SEO tags and hashtags:",
-                            res.data.data
-                          );
-                          localStorage.setItem(
-                            "postContents",
-                            JSON.stringify(res.data.data)
-                          );
-                          alert("✅ Captions generated successfully!");
-                        } else {
-                          console.error("Backend error:", res.data.message);
-                          alert(`Error: ${res.data.message}`);
-                        }
-                      } catch (err: any) {
-                        console.error("Error fetching AI captions:", err);
-                        alert(
-                          `Failed: ${
-                            err.response?.data?.message || err.message
-                          }`
-                        );
-                      } finally {
-                        setLoading(false);
-                      }
-                    }}
-                    whileTap={{ scale: 0.97 }}
-                    className={`w-full text-left px-4 my-2 hover:border-2! hover:border-sky-500! py-2 rounded-xl border transition ${
-                      selectedDescription === t
-                        ? "bg-gradient-to-r from-blue-600 to-indigo-500 text-white border-blue-600 shadow"
-                        : "bg-white/70 dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:border-blue-500"
-                    }`}
-                  >
-                    {t}
-                  </motion.button>
-                ))}
+        console.log("✅ API Response:", res.data);
+        
+        if (res.data.success && res.data.data) {
+          const postContents = {
+            captions: res.data.data.captions || [],
+            hashtags: res.data.data.hashtags || [],
+            seo_tags: res.data.data.seo_tags || [],
+            description: t
+          };
+          
+          localStorage.setItem("postContents", JSON.stringify(postContents));
+          localStorage.setItem("story", t);
+          
+          console.log("✅ Data stored in localStorage:", postContents);
+          console.log("📊 Captions count:", postContents.captions.length);
+          console.log("📊 Hashtags count:", postContents.hashtags.length);
+          
+          alert(`✅ Generated ${postContents.captions.length} captions successfully!`);
+          
+        } else {
+          console.error("❌ Backend returned no data");
+          alert("Error: No captions generated");
+        }
+      } catch (err: any) {
+        console.error("❌ API Error:", err);
+        console.error("Error details:", err.response?.data);
+        alert(`Failed: ${err.response?.data?.message || err.message}`);
+      } finally {
+        setLoading(false);
+      }
+    }}
+    disabled={loading}
+    whileTap={{ scale: 0.97 }}
+    className={`w-full text-left px-4 my-2 hover:border-2 hover:border-sky-500 py-2 rounded-xl border transition ${
+      selectedDescription === t
+        ? "bg-gradient-to-r from-blue-600 to-indigo-500 text-white border-blue-600 shadow"
+        : "bg-white/70 dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:border-blue-500"
+    }`}
+  >
+    {loading && selectedDescription === t ? "Generating captions..." : t}
+  </motion.button>
+))}
               </div>
             </motion.div>
           )}
@@ -340,44 +352,44 @@ export default function Step2Story({
             <ArrowLeft className="h-4 w-4 mr-2" /> Previous
           </Button>
 
-          <Button
-            onClick={async () => {
-              // Get the final story
-              const finalStory = selectedDescription || typedText;
+       <Button
+  onClick={async () => {
+    const finalStory = selectedDescription || typedText;
 
-              if (!finalStory.trim()) {
-                alert("Please select or type a description before proceeding!");
-                return;
-              }
+    if (!finalStory.trim()) {
+      alert("Please select or type a description before proceeding!");
+      return;
+    }
 
-              // Store in localStorage immediately
-              localStorage.setItem("story", finalStory);
+    // ✅ CHECK if captions were generated
+    const postContents = localStorage.getItem("postContents");
+    if (!postContents) {
+      alert("⚠️ Please click on one of the descriptions to generate captions before proceeding!");
+      return;
+    }
 
-              try {
-                // Store in database
-                await storeDescription();
-                await storeData(finalStory);
-                console.log("✅ Story saved:", finalStory);
+    localStorage.setItem("story", finalStory);
+    
+    console.log("📝 Navigating with data:", {
+      story: finalStory,
+      hasPostContents: !!postContents
+    });
+    
+    try {
+      await storeDescription();
+      await storeData(finalStory);
+      console.log("✅ Story saved");
+      onNext();
+    } catch (err) {
+      console.error("❌ Failed to save story:", err);
+      alert("Failed to save story. Please try again.");
+    }
+  }}
+  disabled={!selectedDescription && !typedText.trim()}
+>
+  Next
+</Button>
 
-                // Check if captions were generated
-                const postContents = localStorage.getItem("postContents");
-                if (!postContents) {
-                  console.warn(
-                    "⚠️ No captions generated yet - user will see fallback"
-                  );
-                }
-
-                // Navigate to next step
-                onNext();
-              } catch (err) {
-                console.error("❌ Failed to save story:", err);
-                alert("Failed to save story. Please try again.");
-              }
-            }}
-            disabled={!selectedDescription && !typedText.trim()}
-          >
-            Next
-          </Button>
         </div>
       </Card>
     </motion.div>
