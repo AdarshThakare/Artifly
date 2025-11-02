@@ -298,22 +298,22 @@ export default function PreviewPage({
                 </span>
                 <p className="text-gray-800 dark:text-gray-200 mt-1">{title}</p>
               </div>
-              <div>
+              {/* <div>
                 <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   Category:
                 </span>
                 <span className="ml-2 px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">
                   {category}
                 </span>
-              </div>
-              <div>
+              </div> */}
+              {/* <div>
                 <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   Location:
                 </span>
                 <p className="text-gray-800 dark:text-gray-200 mt-1">
                   {location}
                 </p>
-              </div>
+              </div> */}
               {description && (
                 <div>
                   <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -374,49 +374,51 @@ export default function PreviewPage({
           </AnimatePresence>
 
           {/* Hashtags and SEO */}
-          {(hashtags.length > 0 || seoTags.length > 0) && (
-            <Card className="backdrop-blur-md bg-white/80 dark:bg-gray-900/70 shadow-xl rounded-2xl p-6 border border-gray-200 dark:border-gray-800">
-              <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
-                Hashtags & SEO
-              </h3>
-              <div className="space-y-4">
-                {hashtags.length > 0 && (
-                  <div>
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                      Hashtags:
-                    </span>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {hashtags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="text-blue-600 dark:text-blue-400 text-sm"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {seoTags.length > 0 && (
-                  <div>
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                      SEO Tags:
-                    </span>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {seoTags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-xs"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </Card>
-          )}
+       {/* Hashtags and SEO */}
+{(hashtags.length > 0 || seoTags.length > 0) && (
+  <div >
+    <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
+      Hashtags & SEO
+    </h3>
+    <div className="space-y-4">
+      {hashtags.length > 0 && (
+        <div>
+          <span className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 block">
+            Hashtags:
+          </span>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {hashtags.map((tag, index) => (
+              <span
+                key={index}
+                className="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-sm rounded-full border border-blue-200 dark:border-blue-800 whitespace-nowrap"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      {seoTags.length > 0 && (
+        <div>
+          <span className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 block">
+            SEO Tags:
+          </span>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {seoTags.map((tag, index) => (
+              <span
+                key={index}
+                className="inline-block px-3 py-1.5 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-medium border border-purple-200 dark:border-purple-800 shadow-sm hover:shadow-md transition-shadow break-words max-w-full"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
         </div>
 
         {/* Right Panel - Phone Preview */}
@@ -492,190 +494,206 @@ export default function PreviewPage({
           </motion.div>
           <div className="border-2 mt-3 border-dotted border-gray-400 rounded-lg p-6 text-center">
             <p className="text-gray-600 font-medium">
-              Stay Tuned for Automatic Post Scheduling
+               Automatic Post Scheduling is enabled — just click and relax!
             </p>
           </div>
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex gap-4 mt-8">
-        <Button variant="outline" onClick={onPrevious}>
-          <ArrowLeft className="h-4 w-4 mr-2" /> Back
-        </Button>
-        {/* <Button
-          onClick={async () => {
-            navigate("/dashboard");
+     {/* Action Buttons & Instagram Banner */}
+      <div className="w-full max-w-6xl space-y-6 mt-8">
+        {/* Action Buttons */}
+        <div className="flex justify-center gap-4">
+          <Button variant="outline" onClick={onPrevious}>
+            <ArrowLeft className="h-4 w-4 mr-2" /> Back
+          </Button>
 
-            (async () => {
-              try {
-                await storeData(selectedCaption);
-                console.log("Caption stored successfully");
-              } catch (err) {
-                console.error("Error storing caption:", err);
-              }
-            })();
-          }}
-          disabled={!selectedCaption}
-          className="bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600"
-        >
-          Save Product
-        </Button> */}
-
-        <Button
-          onClick={async () => {
-            console.log(
-              "🔍 Button clicked - selectedCaption:",
-              selectedCaption
-            );
-            console.log("🔍 Captions array:", captions);
-
-            // ✅ Allow proceeding even without captions (use title as fallback)
-            const finalCaption =
-              selectedCaption && selectedCaption.trim() !== ""
-                ? selectedCaption
-                : title || "Check out my product!";
-
-            console.log("📝 Using caption:", finalCaption);
-
-            try {
-              setLoading(true);
-
-              // Gather all data from localStorage
-              const imageBase64Local = localStorage.getItem("ImageBase64");
-              const userTitle = localStorage.getItem("userTitle");
-              const category = localStorage.getItem("category");
-              const location = localStorage.getItem("location");
-              const story = localStorage.getItem("story");
-
-              // ✅ Validate required fields
-              if (!imageBase64Local || !userTitle) {
-                alert(
-                  "Missing required data (image or title). Please go back and complete all steps."
-                );
-                setLoading(false);
-                return;
-              }
-
-              console.log("📦 Preparing to save product...", {
-                userTitle,
-                category,
-                location,
-                hasImage: !!imageBase64Local,
-                hasStory: !!story,
-                finalCaption,
-              });
-
-              // Convert base64 to File for FormData
-              function base64ToFile(base64String: string, filename: string) {
-                const arr = base64String.split(",");
-                const mimeMatch = arr[0].match(/:(.*?);/);
-                const mime = mimeMatch ? mimeMatch[1] : "";
-                const bstr = atob(arr[1]);
-                let n = bstr.length;
-                const u8arr = new Uint8Array(n);
-                while (n--) {
-                  u8arr[n] = bstr.charCodeAt(n);
-                }
-                return new File([u8arr], filename, { type: mime });
-              }
-
-              // Create FormData with all product data
-              const formData = new FormData();
-
-              const imageFile = base64ToFile(imageBase64Local, "product.png");
-              formData.append("image", imageFile);
-              formData.append("name", userTitle);
-              if (category) formData.append("category", category);
-              if (location) formData.append("location", location);
-              if (story) formData.append("description", story);
-
-              // Step 1: Upload complete product to backend
-              console.log("🚀 Uploading product to backend...");
-              const res = await axios.post(
-                `https://artify-backend-dke3.onrender.com/api/products`,
-                formData,
-                {
-                  headers: {
-                    "Content-Type": "multipart/form-data",
-                  },
-                  timeout: 30000, // 30 second timeout
-                }
+          <Button
+            onClick={async () => {
+              console.log(
+                "🔍 Button clicked - selectedCaption:",
+                selectedCaption
               );
-              const product = res.data;
-              console.log("✅ Product saved:", product);
+              console.log("🔍 Captions array:", captions);
 
-              // Store caption, seo, hashtags (optional - won't break if it fails)
+              // ✅ Allow proceeding even without captions (use title as fallback)
+              const finalCaption =
+                selectedCaption && selectedCaption.trim() !== ""
+                  ? selectedCaption
+                  : title || "Check out my product!";
+
+              console.log("📝 Using caption:", finalCaption);
+
               try {
-                await storeData(finalCaption);
-              } catch (err) {
-                console.log("⚠️ Optional storeData failed:", err);
-              }
+                setLoading(true);
 
-              // Step 2: Trigger n8n webhook for Instagram posting (run in background)
-              console.log("📸 Triggering Instagram post via n8n...");
-              const instagramCaption = `${userTitle} — ${finalCaption}${
-                hashtags.length > 0 ? "\n\n" + hashtags.join(" ") : ""
-              }`;
+                // Gather all data from localStorage
+                const imageBase64Local = localStorage.getItem("ImageBase64");
+                const userTitle = localStorage.getItem("userTitle");
+                const category = localStorage.getItem("category");
+                const location = localStorage.getItem("location");
+                const story = localStorage.getItem("story");
 
-              // Don't await this - let it run in background
-              axios
-                .post(
-                  `https://artify-backend-dke3.onrender.com/api/trigger-instagram`,
-                  {
-                    imageUrl: product.imageUrl,
-                    caption: instagramCaption,
-                    productId: product._id,
-                    name: userTitle,
-                    location: location || "",
-                    category: category || "",
-                  },
-                  {
-                    timeout: 10000, // 10 second timeout
-                  }
-                )
-                .then(() => {
-                  console.log("✅ Instagram post triggered successfully");
-                })
-                .catch((err) => {
-                  console.warn(
-                    "⚠️ Instagram post trigger failed (non-critical):",
-                    err
+                // ✅ Validate required fields
+                if (!imageBase64Local || !userTitle) {
+                  alert(
+                    "Missing required data (image or title). Please go back and complete all steps."
                   );
+                  setLoading(false);
+                  return;
+                }
+
+                console.log("📦 Preparing to save product...", {
+                  userTitle,
+                  category,
+                  location,
+                  hasImage: !!imageBase64Local,
+                  hasStory: !!story,
+                  finalCaption,
                 });
 
-              console.log("✅ Product saved successfully!");
-              alert(
-                "Product saved! Instagram post is being processed in the background. ✅"
-              );
+                // Convert base64 to File for FormData
+                function base64ToFile(base64String: string, filename: string) {
+                  const arr = base64String.split(",");
+                  const mimeMatch = arr[0].match(/:(.*?);/);
+                  const mime = mimeMatch ? mimeMatch[1] : "";
+                  const bstr = atob(arr[1]);
+                  let n = bstr.length;
+                  const u8arr = new Uint8Array(n);
+                  while (n--) {
+                    u8arr[n] = bstr.charCodeAt(n);
+                  }
+                  return new File([u8arr], filename, { type: mime });
+                }
 
-              // Clear localStorage
-              localStorage.removeItem("postId");
-              localStorage.removeItem("ImageBase64");
-              localStorage.removeItem("userTitle");
-              localStorage.removeItem("category");
-              localStorage.removeItem("location");
-              localStorage.removeItem("story");
-              localStorage.removeItem("postContents");
+                // Create FormData with all product data
+                const formData = new FormData();
 
-              navigate("/dashboard");
-            } catch (err: any) {
-              console.error("❌ Submission failed:", err);
-              const errorMsg =
-                err?.response?.data?.message ||
-                err?.response?.data?.error ||
-                err.message ||
-                "Something went wrong!";
-              alert(`Error: ${errorMsg}`);
-            } finally {
-              setLoading(false);
-            }
-          }}
-          disabled={loading}
-          className="bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                const imageFile = base64ToFile(imageBase64Local, "product.png");
+                formData.append("image", imageFile);
+                formData.append("name", userTitle);
+                if (category) formData.append("category", category);
+                if (location) formData.append("location", location);
+                if (story) formData.append("description", story);
+
+                // Step 1: Upload complete product to backend
+                console.log("🚀 Uploading product to backend...");
+                const res = await axios.post(
+                  `https://artify-backend-dke3.onrender.com/api/products`,
+                  formData,
+                  {
+                    headers: {
+                      "Content-Type": "multipart/form-data",
+                    },
+                    timeout: 30000, // 30 second timeout
+                  }
+                );
+                const product = res.data;
+                console.log("✅ Product saved:", product);
+
+                // Store caption, seo, hashtags (optional - won't break if it fails)
+                try {
+                  await storeData(finalCaption);
+                } catch (err) {
+                  console.log("⚠️ Optional storeData failed:", err);
+                }
+
+                // Step 2: Trigger n8n webhook for Instagram posting (run in background)
+                console.log("📸 Triggering Instagram post via n8n...");
+                const instagramCaption = `${userTitle} — ${finalCaption}${
+                  hashtags.length > 0 ? "\n\n" + hashtags.join(" ") : ""
+                }`;
+
+                // Don't await this - let it run in background
+                axios
+                  .post(
+                    `https://artify-backend-dke3.onrender.com/api/trigger-instagram`,
+                    {
+                      imageUrl: product.imageUrl,
+                      caption: instagramCaption,
+                      productId: product._id,
+                      name: userTitle,
+                      location: location || "",
+                      category: category || "",
+                    },
+                    {
+                      timeout: 10000, // 10 second timeout
+                    }
+                  )
+                  .then(() => {
+                    console.log("✅ Instagram post triggered successfully");
+                  })
+                  .catch((err) => {
+                    console.warn(
+                      "⚠️ Instagram post trigger failed (non-critical):",
+                      err
+                    );
+                  });
+
+                console.log("✅ Product saved successfully!");
+                alert(
+                  "Product saved! Instagram post is being processed in the background. ✅"
+                );
+
+                // Clear localStorage
+                localStorage.removeItem("postId");
+                localStorage.removeItem("ImageBase64");
+                localStorage.removeItem("userTitle");
+                localStorage.removeItem("category");
+                localStorage.removeItem("location");
+                localStorage.removeItem("story");
+                localStorage.removeItem("postContents");
+
+                navigate("/dashboard");
+              } catch (err: any) {
+                console.error("❌ Submission failed:", err);
+                const errorMsg =
+                  err?.response?.data?.message ||
+                  err?.response?.data?.error ||
+                  err.message ||
+                  "Something went wrong!";
+                alert(`Error(Please try again): ${errorMsg}`);
+              } finally {
+                setLoading(false);
+              }
+            }}
+            disabled={loading}
+            className="bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Posting..." : "Save Product"}
+          </Button>
+        </div>
+
+        {/* Instagram Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="w-full"
         >
-          {loading ? "Posting..." : "Save Product"}
-        </Button>
+          <a
+            href="https://www.instagram.com/artify769/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block"
+          >
+            <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 rounded-2xl p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
+              <div className="flex items-center justify-center gap-4">
+                <svg
+                  className="w-10 h-10 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+                <div className="text-center">
+                  <p className="text-xl font-bold">View Your Product Updates!</p>
+                  <p className="text-sm opacity-90 mt-1">Follow @artify769 on Instagram</p>
+                </div>
+              </div>
+            </div>
+          </a>
+        </motion.div>
       </div>
     </motion.div>
   );
