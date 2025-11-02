@@ -656,7 +656,7 @@ export default function DashboardPage() {
           </Card>
         </div>
       </main>
-       <Jarvis />       
+        <Jarvis />    
       <Footer />
 
       {/* Edit Profile Modal */}

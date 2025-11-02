@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Bot,
   Image as ImageIcon,
@@ -8,8 +8,6 @@ import {
   BookOpen,
   Instagram,
   ShoppingBag,
-  Users,
-  DollarSign,
   Network,
   X,
   Mic,
@@ -24,7 +22,63 @@ import {
   FileText,
   BarChart3,
   Zap,
+  DollarSign,
 } from "lucide-react";
+
+// TypeScript declarations for Web Speech API
+declare global {
+  interface Window {
+    SpeechRecognition: typeof SpeechRecognition;
+    webkitSpeechRecognition: typeof SpeechRecognition;
+  }
+
+  interface SpeechRecognition extends EventTarget {
+    continuous: boolean;
+    interimResults: boolean;
+    lang: string;
+    maxAlternatives: number;
+    onstart: ((this: SpeechRecognition, ev: Event) => unknown) | null;
+    onend: ((this: SpeechRecognition, ev: Event) => unknown) | null;
+    onerror: ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => unknown) | null;
+    onresult: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => unknown) | null;
+    start(): void;
+    stop(): void;
+    abort(): void;
+  }
+
+  var SpeechRecognition: {
+    prototype: SpeechRecognition;
+    new (): SpeechRecognition;
+  };
+
+  interface SpeechRecognitionEvent extends Event {
+    readonly resultIndex: number;
+    readonly results: SpeechRecognitionResultList;
+  }
+
+  interface SpeechRecognitionResultList {
+    readonly length: number;
+    item(index: number): SpeechRecognitionResult;
+    [index: number]: SpeechRecognitionResult;
+  }
+
+  interface SpeechRecognitionResult {
+    readonly length: number;
+    item(index: number): SpeechRecognitionAlternative;
+    [index: number]: SpeechRecognitionAlternative;
+    readonly isFinal: boolean;
+  }
+
+  interface SpeechRecognitionAlternative {
+    readonly transcript: string;
+    readonly confidence: number;
+  }
+
+  interface SpeechRecognitionErrorEvent extends Event {
+    readonly error: string;
+    readonly message: string;
+  }
+}
 
 // Types
 interface Message {
@@ -88,7 +142,9 @@ export default function Chatbot() {
   const recognitionLock = useRef<boolean>(false);
 
   const navigate = useNavigate();
-  const location = useLocation();
+
+  // API Key - Use environment variable in production
+  const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
   // Dashboard routes for artisan platform
   const dashboardRoutes: RouteConfig[] = [
@@ -320,7 +376,6 @@ export default function Chatbot() {
     Bot: <Bot className="h-4 w-4" />,
     Palette: <Palette className="h-4 w-4" />,
     Zap: <Zap className="h-4 w-4" />,
-    Users: <Users className="h-4 w-4" />,
   };
 
   // Normalize path
@@ -332,20 +387,30 @@ export default function Chatbot() {
     return path.replace(/\/+$/, "").toLowerCase();
   };
 
+  // Check if Speech Recognition is supported
+  const isSpeechRecognitionSupported = (): boolean => {
+    return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  };
+
   // Create speech recognition
   const createRecognition = (): SpeechRecognition | null => {
-    const SpeechRecognition =
-      window.SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      console.error("SpeechRecognition API not supported.");
+    try {
+      if (!isSpeechRecognitionSupported()) {
+        console.error("SpeechRecognition API not supported.");
+        return null;
+      }
+
+      const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognitionAPI();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.continuous = true;
+      return recognition;
+    } catch (error) {
+      console.error("Error creating speech recognition:", error);
       return null;
     }
-    const recognition = new SpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    recognition.continuous = true;
-    return recognition;
   };
 
   // Setup recognition handlers
@@ -412,7 +477,7 @@ export default function Chatbot() {
         ]);
         await speakResponse(message);
         await startRecognition();
-      } else {
+      } else if (event.error !== "aborted") {
         recognitionRef.current = null;
         if (!isCleaningUp.current && isListening && mode === "doubt") {
           await startRecognition();
@@ -448,7 +513,7 @@ export default function Chatbot() {
         if (!recognitionRef.current) {
           recognitionLock.current = false;
           const errorMessage =
-            "Speech recognition is not supported on this device.";
+            "Speech recognition is not supported on this device. Please use a supported browser like Chrome or Edge.";
           setConversationHistory((prev) => [
             ...prev,
             { type: "artifly", text: errorMessage },
@@ -474,7 +539,7 @@ export default function Chatbot() {
         await startRecognition(retryCount + 1);
       } else {
         const message =
-          "Sorry, I couldn't start speech recognition. Please try again.";
+          "Sorry, I couldn't start speech recognition. Please try again or use a supported browser.";
         setConversationHistory((prev) => [
           ...prev,
           { type: "artifly", text: message },
@@ -561,8 +626,15 @@ export default function Chatbot() {
 
     let welcomeMessage = "";
     if (selectedMode === "doubt") {
+      if (!isSpeechRecognitionSupported()) {
+        welcomeMessage =
+          "I am Artifly, here to help you with artisan marketing, but speech recognition is not supported on your browser. Please use Chrome or Edge for voice features.";
+        setConversationHistory([{ type: "artifly", text: welcomeMessage }]);
+        await speakResponse(welcomeMessage);
+        return;
+      }
       welcomeMessage =
-        "I am Artifly, here to help you with artisan marketing,instagram automation, image enhancements, AI generated Description, selling your beautiful handcrafted products. Please speak your question.";
+        "I am Artifly, here to help you with artisan marketing, instagram automation, image enhancements, AI generated Description, selling your beautiful handcrafted products. Please speak your question.";
       setConversationHistory([{ type: "artifly", text: welcomeMessage }]);
       await speakResponse(welcomeMessage);
       setIsListening(true);
@@ -644,7 +716,7 @@ User Query: ${query}`;
 
     try {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=AIzaSyA3rmQSwS5aKr2xZiSq0QKmJxrPFlU3Wi8`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${API_KEY}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -694,7 +766,6 @@ User Query: ${query}`;
         localStorage.setItem("artiflyEntries", JSON.stringify(storedEntries));
       } catch (storageError) {
         console.error("Error storing entry:", storageError);
-        // Don't throw - storage error shouldn't trigger the catch block message
       }
 
       // Update sub-mode if in beginner mode
@@ -1087,21 +1158,9 @@ User Query: ${query}`;
                 </div>
 
                 <div className="w-full space-y-4 max-w-sm">
-                  {/* <button
-                    onClick={() => startConversation("beginner")}
-                    className="w-full py-4 px-6 bg-black text-white rounded-2xl hover:bg-gray-800 transition-all duration-300 text-base font-semibold shadow-2xl transform hover:scale-105 border-2 border-black"
-                    aria-label="Start as a beginner"
-                  >
-                    <div className="flex items-center justify-center space-x-3">
-                      <Palette className="h-6 w-6" />
-                      <span>Beginner Guide</span>
-                      <Sparkles className="h-5 w-5" />
-                    </div>
-                  </button> */}
-
                   <button
                     onClick={() => startConversation("doubt")}
-                    className="w-full py-4 px-6 bg-white text-black rounded-2xl hover:bg-gray-100 transition-all duration-300 text-base font-semibold shadow-2xl transform hover:scale-105 border-2 border-black"
+                    className="w-full py-4 px-6 bg-black text-white rounded-2xl hover:bg-gray-800 transition-all duration-300 text-base font-semibold shadow-2xl transform hover:scale-105 border-2 border-black"
                     aria-label="Ask a question"
                   >
                     <div className="flex items-center justify-center space-x-3">
@@ -1116,9 +1175,9 @@ User Query: ${query}`;
                   <h4 className="text-sm font-medium text-gray-600 mb-4 text-center">
                     Note
                   </h4>
-
-                  <p className="text-center">
-                    Speak your question louder and clearly
+                  <p className="text-center text-sm text-gray-600">
+                    Speak your question louder and clearly. Works best on Chrome
+                    & Edge browsers.
                   </p>
                 </div>
               </div>

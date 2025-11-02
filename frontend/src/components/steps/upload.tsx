@@ -50,7 +50,7 @@ export default function Step3Upload({
         }
       );
       console.log(response.data);
-      setAIImages(response.data.data.images);
+      setAIImages(Array.isArray(response.data.data.images) ? response.data.data.images : []);
       setAiCategory(response.data.data.category);
       setAiName(response.data.data.titles[0]);
     } catch (err) {
