@@ -19,7 +19,7 @@ import {
   Facebook,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import Jarvis from "../components/Jarvis.tsx"
+// import Jarvis from "../components/Jarvis.tsx"
 // Mock user data - replace with actual data from your backend
 const mockUser = {
   clerkId: "user_123",
@@ -656,7 +656,7 @@ export default function DashboardPage() {
           </Card>
         </div>
       </main>
-       <Jarvis />       
+       {/* <Jarvis />        */}
       <Footer />
 
       {/* Edit Profile Modal */}
