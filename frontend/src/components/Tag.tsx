@@ -1,6 +1,5 @@
 import React from "react";
 import { X } from "lucide-react";
-
 // Minimal Button replacement
 const Button: React.FC<
   React.ButtonHTMLAttributes<HTMLButtonElement> & {
