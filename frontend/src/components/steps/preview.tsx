@@ -72,36 +72,55 @@ export default function PreviewPage({
   };
 
   useEffect(() => {
-    // Read from localStorage
-    const storedPostContents = localStorage.getItem("postContents");
-    const storedTitle = localStorage.getItem("userTitle");
-    const storedCategory = localStorage.getItem("category");
-    const storedLocation = localStorage.getItem("location");
-    const storedImage = localStorage.getItem("ImageBase64");
+  // Read from localStorage
+  const storedPostContents = localStorage.getItem("postContents");
+  const storedTitle = localStorage.getItem("userTitle");
+  const storedCategory = localStorage.getItem("category");
+  const storedLocation = localStorage.getItem("location");
+  const storedImage = localStorage.getItem("ImageBase64");
+  const storedStory = localStorage.getItem("story"); // ✅ Add this
 
-    if (storedPostContents) {
+  console.log("🔍 Loading preview data...");
+  console.log("storedPostContents:", storedPostContents);
+
+  if (storedPostContents) {
+    try {
       const parsed = JSON.parse(storedPostContents);
+      console.log("📦 Parsed postContents:", parsed);
+      
+      // ✅ Set data with fallbacks
       setCaptions(parsed.captions || []);
       setHashtags(parsed.hashtags || []);
       setSeoTags(parsed.seo_tags || []);
-      setDescription(parsed.description || "");
+      setDescription(parsed.description || storedStory || ""); // ✅ Use story as fallback
+      
       // Set first caption as default if available
       if (parsed?.captions?.length > 0) {
         setSelectedCaption(parsed.captions[0]);
+        console.log("✅ Set default caption:", parsed.captions[0]);
+      } else {
+        console.warn("⚠️ No captions found in postContents");
       }
+    } catch (err) {
+      console.error("❌ Failed to parse postContents:", err);
     }
+  } else {
+    console.warn("⚠️ No postContents in localStorage");
+  }
 
-    if (storedTitle) setTitle(storedTitle);
-    if (storedCategory) setCategory(storedCategory);
-    if (storedLocation) setLocation(storedLocation);
-    // ✅ Validate before setting
-    if (storedImage && storedImage.startsWith("data:image/")) {
-      setImageBase64(storedImage);
-      console.log(storedImage);
-    } else {
-      console.warn("⚠️ No valid imageBase64 found in localStorage");
-    }
-  }, []);
+  if (storedTitle) setTitle(storedTitle);
+  if (storedCategory) setCategory(storedCategory);
+  if (storedLocation) setLocation(storedLocation);
+  
+  // ✅ Validate before setting
+  if (storedImage && storedImage.startsWith("data:image/")) {
+    setImageBase64(storedImage);
+    console.log("✅ Image loaded");
+  } else {
+    console.warn("⚠️ No valid imageBase64 found in localStorage");
+  }
+}, []);
+
 
   const InstagramPost = () => (
     <div className="bg-white rounded-lg overflow-hidden shadow-sm">

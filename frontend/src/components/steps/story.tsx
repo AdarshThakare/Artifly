@@ -147,47 +147,47 @@ export default function Step2Story({
     }
   };
 
-  const handleGenerate = async () => {
-    if (!typedText.trim()) {
-      alert("Please fill in the description first!");
-      return;
-    }
-    setLoading(true);
+ const handleGenerate = async () => {
+  if (!typedText.trim()) {
+    alert("Please fill in the description first!");
+    return;
+  }
+  setLoading(true);
 
-    console.log("SELECTED", userTitle, location, category);
-    try {
-      // Create FormData and append required fields
-      const formData = new FormData();
-      if (userTitle && location && category) {
-        formData.append("user_title", userTitle);
-        formData.append("location", location);
-        formData.append("category", category);
-        formData.append("description", typedText);
+  console.log("SELECTED", userTitle, location, category);
+  try {
+    const formData = new FormData();
+    
+    // ✅ REMOVE THE CONDITIONAL - Always append all fields
+    formData.append("user_title", userTitle || "");
+    formData.append("location", location || "");
+    formData.append("category", category || "");
+    formData.append("description", typedText);
+
+    const res = await axios.post(
+      "https://genai-exchange-llm-api-3.onrender.com/gen-stories",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }
+    );
 
-      const res = await axios.post(
-        "https://genai-exchange-llm-api-3.onrender.com/gen-stories",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      console.log("Response", res.data);
-      if (res.data.success) {
-        console.log("Generated Titles:", res.data.data.stories);
-        setAiDescriptions(res.data.data.stories);
-      } else {
-        console.error("Backend error:", res.data.message);
-      }
-    } catch (err) {
-      console.error("Error fetching AI titles:", err);
-    } finally {
-      setLoading(false);
+    console.log("Response", res.data);
+    if (res.data.success) {
+      console.log("Generated Titles:", res.data.data.stories);
+      setAiDescriptions(res.data.data.stories);
+    } else {
+      console.error("Backend error:", res.data.message);
     }
-  };
+  } catch (err) {
+    console.error("Error fetching AI titles:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <motion.div
