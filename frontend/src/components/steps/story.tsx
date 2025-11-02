@@ -42,6 +42,19 @@ export default function Step2Story({
     return new File([u8arr], filename, { type: mime });
   }
 
+  const speak = (text: string) => {
+    if (!window.speechSynthesis) {
+      alert("Sorry, your browser does not support text-to-speech.");
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-US"; // Indian English accent
+    utterance.rate = 1;
+    utterance.pitch = 1.2;
+    window.speechSynthesis.cancel(); // stop ongoing speech
+    window.speechSynthesis.speak(utterance);
+  };
+
   const storeData = async (story: string) => {
     const postId = localStorage.getItem("postId");
     try {
@@ -236,77 +249,87 @@ export default function Step2Story({
                 Choose Your Enhanced Story-telling Description:
               </p>
               <div className="grid gap-3">
+                {[typedText, ...aiDescriptions].map((t, idx) => (
+                  <motion.button
+                    key={idx}
+                    onClick={async () => {
+                      setSelectedDescription(t);
+                      speak(t);
 
-{[typedText, ...aiDescriptions].map((t, idx) => (
-  <motion.button
-    key={idx}
-    onClick={async () => {
-      setSelectedDescription(t);
-      
-      // ✅ FIX: Pass the description directly instead of using state
-      if (!t.trim()) {
-        alert("Please fill in the description first!");
-        return;
-      }
-      setLoading(true);
-      
-      if (!image) {
-        console.log("Image not found!");
-        setLoading(false);
-        return;
-      }
+                      // ✅ FIX: Pass the description directly instead of using state
+                      if (!t.trim()) {
+                        alert("Please fill in the description first!");
+                        return;
+                      }
+                      setLoading(true);
 
-      const file = base64ToFile(image, "product.png");
+                      if (!image) {
+                        console.log("Image not found!");
+                        setLoading(false);
+                        return;
+                      }
 
-      console.log("SELECTED", userTitle, location, category);
-      console.log("Description being sent:", t); // ✅ Debug log
-      
-      try {
-        const formData = new FormData();
-        if (userTitle && location && category) {
-          formData.append("image", file);
-          formData.append("title", userTitle);
-          formData.append("description", t); // ✅ Use 't' directly, not state
-          formData.append("category", category);
-          formData.append("location", location);
-        }
+                      const file = base64ToFile(image, "product.png");
 
-        const res = await axios.post(
-          "https://genai-exchange-llm-api-3.onrender.com/gen-tags-captions",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+                      console.log("SELECTED", userTitle, location, category);
+                      console.log("Description being sent:", t); // ✅ Debug log
 
-        console.log("✅ AI Response:", res.data);
-        if (res.data.success) {
-          console.log("Captions, SEO tags and hashtags:", res.data.data);
-          localStorage.setItem("postContents", JSON.stringify(res.data.data));
-          alert("✅ Captions generated successfully!");
-        } else {
-          console.error("Backend error:", res.data.message);
-          alert(`Error: ${res.data.message}`);
-        }
-      } catch (err: any) {
-        console.error("Error fetching AI captions:", err);
-        alert(`Failed: ${err.response?.data?.message || err.message}`);
-      } finally {
-        setLoading(false);
-      }
-    }}
-    whileTap={{ scale: 0.97 }}
-    className={`w-full text-left px-4 my-2 hover:border-2! hover:border-sky-500! py-2 rounded-xl border transition ${
-      selectedDescription === t
-        ? "bg-gradient-to-r from-blue-600 to-indigo-500 text-white border-blue-600 shadow"
-        : "bg-white/70 dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:border-blue-500"
-    }`}
-  >
-    {t}
-  </motion.button>
-))}
+                      try {
+                        const formData = new FormData();
+                        if (userTitle && location && category) {
+                          formData.append("image", file);
+                          formData.append("title", userTitle);
+                          formData.append("description", t); // ✅ Use 't' directly, not state
+                          formData.append("category", category);
+                          formData.append("location", location);
+                        }
+
+                        const res = await axios.post(
+                          "https://genai-exchange-llm-api-3.onrender.com/gen-tags-captions",
+                          formData,
+                          {
+                            headers: {
+                              "Content-Type": "multipart/form-data",
+                            },
+                          }
+                        );
+
+                        console.log("✅ AI Response:", res.data);
+                        if (res.data.success) {
+                          console.log(
+                            "Captions, SEO tags and hashtags:",
+                            res.data.data
+                          );
+                          localStorage.setItem(
+                            "postContents",
+                            JSON.stringify(res.data.data)
+                          );
+                          alert("✅ Captions generated successfully!");
+                        } else {
+                          console.error("Backend error:", res.data.message);
+                          alert(`Error: ${res.data.message}`);
+                        }
+                      } catch (err: any) {
+                        console.error("Error fetching AI captions:", err);
+                        alert(
+                          `Failed: ${
+                            err.response?.data?.message || err.message
+                          }`
+                        );
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    whileTap={{ scale: 0.97 }}
+                    className={`w-full text-left px-4 my-2 hover:border-2! hover:border-sky-500! py-2 rounded-xl border transition ${
+                      selectedDescription === t
+                        ? "bg-gradient-to-r from-blue-600 to-indigo-500 text-white border-blue-600 shadow"
+                        : "bg-white/70 dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:border-blue-500"
+                    }`}
+                  >
+                    {t}
+                  </motion.button>
+                ))}
               </div>
             </motion.div>
           )}
@@ -318,41 +341,43 @@ export default function Step2Story({
           </Button>
 
           <Button
-  onClick={async () => {
-    // Get the final story
-    const finalStory = selectedDescription || typedText;
+            onClick={async () => {
+              // Get the final story
+              const finalStory = selectedDescription || typedText;
 
-    if (!finalStory.trim()) {
-      alert("Please select or type a description before proceeding!");
-      return;
-    }
+              if (!finalStory.trim()) {
+                alert("Please select or type a description before proceeding!");
+                return;
+              }
 
-    // Store in localStorage immediately
-    localStorage.setItem("story", finalStory);
-    
-    try {
-      // Store in database
-      await storeDescription();
-      await storeData(finalStory);
-      console.log("✅ Story saved:", finalStory);
-      
-      // Check if captions were generated
-      const postContents = localStorage.getItem("postContents");
-      if (!postContents) {
-        console.warn("⚠️ No captions generated yet - user will see fallback");
-      }
-      
-      // Navigate to next step
-      onNext();
-    } catch (err) {
-      console.error("❌ Failed to save story:", err);
-      alert("Failed to save story. Please try again.");
-    }
-  }}
-  disabled={!selectedDescription && !typedText.trim()}
->
-  Next
-</Button>
+              // Store in localStorage immediately
+              localStorage.setItem("story", finalStory);
+
+              try {
+                // Store in database
+                await storeDescription();
+                await storeData(finalStory);
+                console.log("✅ Story saved:", finalStory);
+
+                // Check if captions were generated
+                const postContents = localStorage.getItem("postContents");
+                if (!postContents) {
+                  console.warn(
+                    "⚠️ No captions generated yet - user will see fallback"
+                  );
+                }
+
+                // Navigate to next step
+                onNext();
+              } catch (err) {
+                console.error("❌ Failed to save story:", err);
+                alert("Failed to save story. Please try again.");
+              }
+            }}
+            disabled={!selectedDescription && !typedText.trim()}
+          >
+            Next
+          </Button>
         </div>
       </Card>
     </motion.div>

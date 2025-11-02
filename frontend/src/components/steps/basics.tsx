@@ -54,9 +54,9 @@ export default function Step1Basics({
       return;
     }
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-IN"; // Indian English accent
+    utterance.lang = "hi-IN"; // Indian English accent
     utterance.rate = 1;
-    utterance.pitch = 1;
+    utterance.pitch = 1.1;
     window.speechSynthesis.cancel(); // stop ongoing speech
     window.speechSynthesis.speak(utterance);
   };
@@ -193,13 +193,11 @@ export default function Step1Basics({
     return data.secure_url;
   }
 
-
   const storeSelectedImage = async (image: string) => {
     try {
       const imageUrl = await uploadBase64ToCloudinary(image);
       const postId = localStorage.getItem("postId");
-      // await fetch("http://localhost:3000/api/v1/post/store-image", {
-      await fetch("https://artifly-backend.onrender.com/api/v1/post/store-image", {
+      await fetch("http://localhost:3000/api/v1/post/store-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ postId: postId, imageUrl }),
@@ -212,9 +210,9 @@ export default function Step1Basics({
   const storePrimitives = async () => {
     try {
       const response = await axios.post(
-        "https://artifly-backend.onrender.com/api/v1/post/",
+        "http://localhost:3000/api/v1/post/",
         {
-          clerkId: clerk_id,
+          clerkId: clerkId,
           name: selectedTitle,
           category: selectedCategory,
           location: location,
@@ -234,7 +232,7 @@ export default function Step1Basics({
     try {
       const postId = localStorage.getItem("postId");
       const response = await axios.post(
-        `https://artifly-backend.onrender.com/api/v1/post/store-title/${postId}`,
+        `http://localhost:3000/api/v1/post/store-title/${postId}`,
         { title: title },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -266,8 +264,10 @@ export default function Step1Basics({
               <p className="text-xl text-gray-600 font-semibold mb-2">
                 Product Name
               </p>
-              <button onClick={() => speak("Enter the name of your product.")}>
-                <Volume2 className="h-5 w-5 text-gray-500 hover:text-blue-600 transition" />
+              <button
+                onClick={() => speak("Krupayaa aapkay sahitya ka naam daalie.")}
+              >
+                <Volume2 className="h-5 w-5 mb-3 text-gray-500 hover:text-blue-600 transition" />
               </button>
             </div>
             <Input
@@ -281,7 +281,7 @@ export default function Step1Basics({
               <p className="text-xl font-light text-cyan-700">
                 AI suggestion - {aiName}
               </p>
-              <button onClick={() => speak(`AI suggestion: ${aiName}`)}>
+              <button onClick={() => speak(`A.I. ka soojhaw    ${aiName}`)}>
                 <Volume2 className="h-5 w-5 text-gray-500 hover:text-blue-600 transition" />
               </button>
             </div>
@@ -291,8 +291,12 @@ export default function Step1Basics({
           <div>
             <div className="flex items-center gap-2">
               <p className="text-xl font-semibold mb-2">Category</p>
-              <button onClick={() => speak("Select your product category.")}>
-                <Volume2 className="h-5 w-5 text-gray-500 hover:text-blue-600 transition" />
+              <button
+                onClick={() =>
+                  speak("Krupayaa aapkay sahitya ka prkaar daalie..")
+                }
+              >
+                <Volume2 className="h-5 w-5 mb-3 text-gray-500 hover:text-blue-600 transition" />
               </button>
             </div>
             <Select
@@ -315,15 +319,7 @@ export default function Step1Basics({
                 AI suggestion -{" "}
                 {aiCategory.charAt(0).toUpperCase() + aiCategory.slice(1)}
               </p>
-              <button
-                onClick={() =>
-                  speak(
-                    `AI suggests category: ${
-                      aiCategory.charAt(0).toUpperCase() + aiCategory.slice(1)
-                    }`
-                  )
-                }
-              >
+              <button onClick={() => speak(`A.I. ka soojhaw   ${aiCategory}`)}>
                 <Volume2 className="h-5 w-5 text-gray-500 hover:text-blue-600 transition" />
               </button>
             </div>
@@ -335,8 +331,8 @@ export default function Step1Basics({
               <p className="text-xl text-gray-600 font-semibold mb-2">
                 Location
               </p>
-              <button onClick={() => speak("Enter or detect your location.")}>
-                <Volume2 className="h-5 w-5 text-gray-500 hover:text-blue-600 transition" />
+              <button onClick={() => speak("Krupaya aapka loocation daalie.")}>
+                <Volume2 className="h-5 w-5 mb-3 text-gray-500 hover:text-blue-600 transition" />
               </button>
             </div>
             <div className="relative">
@@ -404,16 +400,21 @@ export default function Step1Basics({
                   Choose Your Title:
                 </p>
                 <button
-                  onClick={() => speak("Choose one title from the list.")}
+                  onClick={() =>
+                    speak("Upnney pasand ke title ka chunaav karein.")
+                  }
                 >
-                  <Volume2 className="h-5 w-5 text-gray-500 hover:text-blue-600 transition" />
+                  <Volume2 className="h-5 w-5 mt-4 text-gray-500 hover:text-blue-600 transition" />
                 </button>
               </div>
               <div className="grid gap-3">
                 {[title, ...aiTitles].map((t, idx) => (
                   <motion.button
                     key={idx}
-                    onClick={() => setSelectedTitle(t)}
+                    onClick={() => {
+                      setSelectedTitle(t);
+                      speak(t);
+                    }}
                     whileTap={{ scale: 0.97 }}
                     className={`w-full md:grid md:grid-cols-2 text-left px-4 py-2 rounded-xl hover:border-2 hover:border-sky-500 border transition ${
                       selectedTitle === t

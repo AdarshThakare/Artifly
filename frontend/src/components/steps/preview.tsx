@@ -35,8 +35,7 @@ export default function PreviewPage({
   const [hashtags, setHashtags] = useState<string[]>([]);
   const [seoTags, setSeoTags] = useState<string[]>([]);
   const [imageBase64, setImageBase64] = useState("");
-const [loading, setLoading] = useState(false); // ✅ Add at top of component
-
+  const [loading, setLoading] = useState(false); // ✅ Add at top of component
 
   const { user } = useUser();
 
@@ -56,8 +55,8 @@ const [loading, setLoading] = useState(false); // ✅ Add at top of component
         // `http://localhost:3000/api/v1/post/${postId}`,
         `https://artifly-backend.onrender.com/api/v1/post/${postId}`,
         {
-          seo_tags: parsed?.seo_tags,
-          hashtags: parsed?.hashtags,
+          seo_tags: parsed?.seo_tags[0],
+          hashtags: parsed?.hashtags[0],
           caption: selectedCaption,
         },
         {
@@ -504,143 +503,160 @@ const [loading, setLoading] = useState(false); // ✅ Add at top of component
           Save Product
         </Button> */}
 
+        <Button
+          onClick={async () => {
+            console.log(
+              "🔍 Button clicked - selectedCaption:",
+              selectedCaption
+            );
+            console.log("🔍 Captions array:", captions);
 
-       <Button
-  onClick={async () => {
-    console.log("🔍 Button clicked - selectedCaption:", selectedCaption);
-    console.log("🔍 Captions array:", captions);
-    
-    // ✅ Allow proceeding even without captions (use title as fallback)
-    const finalCaption = selectedCaption && selectedCaption.trim() !== "" 
-      ? selectedCaption 
-      : title || "Check out my product!";
-    
-    console.log("📝 Using caption:", finalCaption);
+            // ✅ Allow proceeding even without captions (use title as fallback)
+            const finalCaption =
+              selectedCaption && selectedCaption.trim() !== ""
+                ? selectedCaption
+                : title || "Check out my product!";
 
-    try {
-      setLoading(true);
-      
-      // Gather all data from localStorage
-      const imageBase64Local = localStorage.getItem("ImageBase64");
-      const userTitle = localStorage.getItem("userTitle");
-      const category = localStorage.getItem("category");
-      const location = localStorage.getItem("location");
-      const story = localStorage.getItem("story");
+            console.log("📝 Using caption:", finalCaption);
 
-      // ✅ Validate required fields
-      if (!imageBase64Local || !userTitle) {
-        alert("Missing required data (image or title). Please go back and complete all steps.");
-        setLoading(false);
-        return;
-      }
-      
-      console.log("📦 Preparing to save product...", {
-        userTitle,
-        category,
-        location,
-        hasImage: !!imageBase64Local,
-        hasStory: !!story,
-        finalCaption
-      });
+            try {
+              setLoading(true);
 
-      // Convert base64 to File for FormData
-      function base64ToFile(base64String: string, filename: string) {
-        const arr = base64String.split(",");
-        const mimeMatch = arr[0].match(/:(.*?);/);
-        const mime = mimeMatch ? mimeMatch[1] : "";
-        const bstr = atob(arr[1]);
-        let n = bstr.length;
-        const u8arr = new Uint8Array(n);
-        while (n--) {
-          u8arr[n] = bstr.charCodeAt(n);
-        }
-        return new File([u8arr], filename, { type: mime });
-      }
+              // Gather all data from localStorage
+              const imageBase64Local = localStorage.getItem("ImageBase64");
+              const userTitle = localStorage.getItem("userTitle");
+              const category = localStorage.getItem("category");
+              const location = localStorage.getItem("location");
+              const story = localStorage.getItem("story");
 
-      // Create FormData with all product data
-      const formData = new FormData();
-      
-      const imageFile = base64ToFile(imageBase64Local, "product.png");
-      formData.append("image", imageFile);
-      formData.append("name", userTitle);
-      if (category) formData.append("category", category);
-      if (location) formData.append("location", location);
-      if (story) formData.append("description", story);
+              // ✅ Validate required fields
+              if (!imageBase64Local || !userTitle) {
+                alert(
+                  "Missing required data (image or title). Please go back and complete all steps."
+                );
+                setLoading(false);
+                return;
+              }
 
-      // Step 1: Upload complete product to backend
-      console.log("🚀 Uploading product to backend...");
-      const res = await axios.post(
-        `https://artify-backend-dke3.onrender.com/api/products`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-          timeout: 30000, // 30 second timeout
-        }
-      );
-      const product = res.data;
-      console.log("✅ Product saved:", product);
+              console.log("📦 Preparing to save product...", {
+                userTitle,
+                category,
+                location,
+                hasImage: !!imageBase64Local,
+                hasStory: !!story,
+                finalCaption,
+              });
 
-      // Store caption, seo, hashtags (optional - won't break if it fails)
-      try {
-        await storeData(finalCaption);
-      } catch (err) {
-        console.log("⚠️ Optional storeData failed:", err);
-      }
+              // Convert base64 to File for FormData
+              function base64ToFile(base64String: string, filename: string) {
+                const arr = base64String.split(",");
+                const mimeMatch = arr[0].match(/:(.*?);/);
+                const mime = mimeMatch ? mimeMatch[1] : "";
+                const bstr = atob(arr[1]);
+                let n = bstr.length;
+                const u8arr = new Uint8Array(n);
+                while (n--) {
+                  u8arr[n] = bstr.charCodeAt(n);
+                }
+                return new File([u8arr], filename, { type: mime });
+              }
 
-      // Step 2: Trigger n8n webhook for Instagram posting (run in background)
-      console.log("📸 Triggering Instagram post via n8n...");
-      const instagramCaption = `${userTitle} — ${finalCaption}${hashtags.length > 0 ? '\n\n' + hashtags.join(" ") : ''}`;
-      
-      // Don't await this - let it run in background
-      axios.post(
-        `https://artify-backend-dke3.onrender.com/api/trigger-instagram`,
-        {
-          imageUrl: product.imageUrl,
-          caption: instagramCaption,
-          productId: product._id,
-          name: userTitle,
-          location: location || "",
-          category: category || "",
-        },
-        {
-          timeout: 10000, // 10 second timeout
-        }
-      ).then(() => {
-        console.log("✅ Instagram post triggered successfully");
-      }).catch((err) => {
-        console.warn("⚠️ Instagram post trigger failed (non-critical):", err);
-      });
+              // Create FormData with all product data
+              const formData = new FormData();
 
-      console.log("✅ Product saved successfully!");
-      alert("Product saved! Instagram post is being processed in the background. ✅");
-      
-      // Clear localStorage
-      localStorage.removeItem("postId");
-      localStorage.removeItem("ImageBase64");
-      localStorage.removeItem("userTitle");
-      localStorage.removeItem("category");
-      localStorage.removeItem("location");
-      localStorage.removeItem("story");
-      localStorage.removeItem("postContents");
-      
-      navigate("/dashboard");
+              const imageFile = base64ToFile(imageBase64Local, "product.png");
+              formData.append("image", imageFile);
+              formData.append("name", userTitle);
+              if (category) formData.append("category", category);
+              if (location) formData.append("location", location);
+              if (story) formData.append("description", story);
 
-    } catch (err: any) {
-      console.error("❌ Submission failed:", err);
-      const errorMsg = err?.response?.data?.message || err?.response?.data?.error || err.message || "Something went wrong!";
-      alert(`Error: ${errorMsg}`);
-    } finally {
-      setLoading(false);
-    }
-  }}
-  disabled={loading}
-  className="bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
->
-  {loading ? "Posting..." : "Save Product"}
-</Button>
+              // Step 1: Upload complete product to backend
+              console.log("🚀 Uploading product to backend...");
+              const res = await axios.post(
+                `https://artify-backend-dke3.onrender.com/api/products`,
+                formData,
+                {
+                  headers: {
+                    "Content-Type": "multipart/form-data",
+                  },
+                  timeout: 30000, // 30 second timeout
+                }
+              );
+              const product = res.data;
+              console.log("✅ Product saved:", product);
 
+              // Store caption, seo, hashtags (optional - won't break if it fails)
+              try {
+                await storeData(finalCaption);
+              } catch (err) {
+                console.log("⚠️ Optional storeData failed:", err);
+              }
+
+              // Step 2: Trigger n8n webhook for Instagram posting (run in background)
+              console.log("📸 Triggering Instagram post via n8n...");
+              const instagramCaption = `${userTitle} — ${finalCaption}${
+                hashtags.length > 0 ? "\n\n" + hashtags.join(" ") : ""
+              }`;
+
+              // Don't await this - let it run in background
+              axios
+                .post(
+                  `https://artify-backend-dke3.onrender.com/api/trigger-instagram`,
+                  {
+                    imageUrl: product.imageUrl,
+                    caption: instagramCaption,
+                    productId: product._id,
+                    name: userTitle,
+                    location: location || "",
+                    category: category || "",
+                  },
+                  {
+                    timeout: 10000, // 10 second timeout
+                  }
+                )
+                .then(() => {
+                  console.log("✅ Instagram post triggered successfully");
+                })
+                .catch((err) => {
+                  console.warn(
+                    "⚠️ Instagram post trigger failed (non-critical):",
+                    err
+                  );
+                });
+
+              console.log("✅ Product saved successfully!");
+              alert(
+                "Product saved! Instagram post is being processed in the background. ✅"
+              );
+
+              // Clear localStorage
+              localStorage.removeItem("postId");
+              localStorage.removeItem("ImageBase64");
+              localStorage.removeItem("userTitle");
+              localStorage.removeItem("category");
+              localStorage.removeItem("location");
+              localStorage.removeItem("story");
+              localStorage.removeItem("postContents");
+
+              navigate("/dashboard");
+            } catch (err: any) {
+              console.error("❌ Submission failed:", err);
+              const errorMsg =
+                err?.response?.data?.message ||
+                err?.response?.data?.error ||
+                err.message ||
+                "Something went wrong!";
+              alert(`Error: ${errorMsg}`);
+            } finally {
+              setLoading(false);
+            }
+          }}
+          disabled={loading}
+          className="bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? "Posting..." : "Save Product"}
+        </Button>
       </div>
     </motion.div>
   );
