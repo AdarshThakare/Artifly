@@ -134,47 +134,47 @@ export default function Step2Story({
     }
   };
 
-  const handleGenerate = async () => {
-    if (!typedText.trim()) {
-      alert("Please fill in the description first!");
-      return;
-    }
-    setLoading(true);
+ const handleGenerate = async () => {
+  if (!typedText.trim()) {
+    alert("Please fill in the description first!");
+    return;
+  }
+  setLoading(true);
 
-    console.log("SELECTED", userTitle, location, category);
-    try {
-      // Create FormData and append required fields
-      const formData = new FormData();
-      if (userTitle && location && category) {
-        formData.append("user_title", userTitle);
-        formData.append("location", location);
-        formData.append("category", category);
-        formData.append("description", typedText);
+  console.log("SELECTED", userTitle, location, category);
+  try {
+    const formData = new FormData();
+    
+    // ✅ REMOVE THE CONDITIONAL - Always append all fields
+    formData.append("user_title", userTitle || "");
+    formData.append("location", location || "");
+    formData.append("category", category || "");
+    formData.append("description", typedText);
+
+    const res = await axios.post(
+      "https://genai-exchange-llm-api-3.onrender.com/gen-stories",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }
+    );
 
-      const res = await axios.post(
-        "https://genai-exchange-llm-api-3.onrender.com/gen-stories",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      console.log("Response", res.data);
-      if (res.data.success) {
-        console.log("Generated Titles:", res.data.data.stories);
-        setAiDescriptions(res.data.data.stories);
-      } else {
-        console.error("Backend error:", res.data.message);
-      }
-    } catch (err) {
-      console.error("Error fetching AI titles:", err);
-    } finally {
-      setLoading(false);
+    console.log("Response", res.data);
+    if (res.data.success) {
+      console.log("Generated Titles:", res.data.data.stories);
+      setAiDescriptions(res.data.data.stories);
+    } else {
+      console.error("Backend error:", res.data.message);
     }
-  };
+  } catch (err) {
+    console.error("Error fetching AI titles:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <motion.div
@@ -240,63 +240,84 @@ export default function Step2Story({
 {[typedText, ...aiDescriptions].map((t, idx) => (
   <motion.button
     key={idx}
-    onClick={async () => {
-      setSelectedDescription(t);
-      
-      // ✅ FIX: Pass the description directly instead of using state
-      if (!t.trim()) {
-        alert("Please fill in the description first!");
-        return;
+ onClick={async () => {
+  setSelectedDescription(t);
+  
+  if (!t.trim()) {
+    alert("Please fill in the description first!");
+    return;
+  }
+  
+  setLoading(true);
+  
+  if (!image) {
+    console.log("Image not found!");
+    setLoading(false);
+    return;
+  }
+
+  const file = base64ToFile(image, "product.png");
+
+  console.log("SELECTED", userTitle, location, category);
+  console.log("Description being sent:", t);
+  
+  try {
+    const formData = new FormData();
+    
+    formData.append("image", file);
+    formData.append("title", userTitle || "");
+    formData.append("description", t);
+    formData.append("category", category || "");
+    formData.append("location", location || "");
+
+    const res = await axios.post(
+      "https://genai-exchange-llm-api-3.onrender.com/gen-tags-captions",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }
-      setLoading(true);
+    );
+
+    console.log("✅ AI Response:", res.data);
+    
+    if (res.data.success) {
+      console.log("Captions, SEO tags and hashtags:", res.data.data);
       
-      if (!image) {
-        console.log("Image not found!");
-        setLoading(false);
-        return;
-      }
-
-      const file = base64ToFile(image, "product.png");
-
-      console.log("SELECTED", userTitle, location, category);
-      console.log("Description being sent:", t); // ✅ Debug log
+      // ✅ FIX: Store the complete data structure correctly
+      const postContents = {
+        captions: res.data.data.captions || [],
+        hashtags: res.data.data.hashtags || [],
+        seo_tags: res.data.data.seo_tags || [],
+        description: t  // ✅ Add description to stored data
+      };
       
-      try {
-        const formData = new FormData();
-        if (userTitle && location && category) {
-          formData.append("image", file);
-          formData.append("title", userTitle);
-          formData.append("description", t); // ✅ Use 't' directly, not state
-          formData.append("category", category);
-          formData.append("location", location);
-        }
+      localStorage.setItem("postContents", JSON.stringify(postContents));
+      
+      // ✅ Also store story for later use
+      localStorage.setItem("story", t);
+      
+      console.log("✅ Stored postContents:", postContents);
+      
+      alert("✅ Captions generated successfully!");
+      
+      // ✅ Optional: Auto-navigate to next step after success
+      // onNext(); // Uncomment if you want automatic navigation
+      
+    } else {
+      console.error("Backend error:", res.data.message);
+      alert(`Error: ${res.data.message}`);
+    }
+  } catch (err: any) {
+    console.error("Error fetching AI captions:", err);
+    alert(`Failed: ${err.response?.data?.message || err.message}`);
+  } finally {
+    setLoading(false);
+  }
+}}
 
-        const res = await axios.post(
-          "https://genai-exchange-llm-api-3.onrender.com/gen-tags-captions",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
 
-        console.log("✅ AI Response:", res.data);
-        if (res.data.success) {
-          console.log("Captions, SEO tags and hashtags:", res.data.data);
-          localStorage.setItem("postContents", JSON.stringify(res.data.data));
-          alert("✅ Captions generated successfully!");
-        } else {
-          console.error("Backend error:", res.data.message);
-          alert(`Error: ${res.data.message}`);
-        }
-      } catch (err: any) {
-        console.error("Error fetching AI captions:", err);
-        alert(`Failed: ${err.response?.data?.message || err.message}`);
-      } finally {
-        setLoading(false);
-      }
-    }}
     whileTap={{ scale: 0.97 }}
     className={`w-full text-left px-4 my-2 hover:border-2! hover:border-sky-500! py-2 rounded-xl border transition ${
       selectedDescription === t
