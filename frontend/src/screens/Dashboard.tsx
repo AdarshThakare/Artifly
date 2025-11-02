@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   Upload,
   Edit,
@@ -19,6 +20,7 @@ import {
   Facebook,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 // import Jarvis from "../components/Jarvis.tsx"
 // Mock user data - replace with actual data from your backend
 const mockUser = {
@@ -45,7 +47,8 @@ interface Product {
   caption: string;
   hashtags: string[];
   seo_tags: string[];
-  image_base64: string;
+  images: string[];
+  user: string;
   timestamp: string;
 }
 
@@ -347,15 +350,18 @@ export default function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userData, setUserData] = useState<User>(mockUser);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Replace with actual API call
-        // const response = await axios.get('/api/products');
-        // setProducts(response.data);
-        setProducts([]);
+        const response = await axios.get(
+          "https://artifly-backend.onrender.com/api/v1/post/"
+        );
+        setProducts(response.data.data);
       } catch (err) {
+        setProducts([]);
         console.log(err);
       } finally {
         setLoading(false);
@@ -383,7 +389,7 @@ export default function DashboardPage() {
   const getStatusBadge = (product: Product) => {
     const hasContent =
       product.name || product.description || product.title || product.story;
-    const hasImage = product.image_base64;
+    const hasImage = product.images[0];
 
     if (hasContent && hasImage) {
       return (
@@ -503,7 +509,11 @@ export default function DashboardPage() {
                     <Upload className="h-5 w-5 text-blue-600" />
                     Upload New Product
                   </span>
-                  <Button>
+                  <Button
+                    onClick={() => {
+                      navigate("/onboarding");
+                    }}
+                  >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Product
                   </Button>
@@ -543,9 +553,9 @@ export default function DashboardPage() {
                     >
                       {/* Product Image */}
                       <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
-                        {product.image_base64 ? (
+                        {product.images.length > 0 ? (
                           <img
-                            src={`data:image/jpeg;base64,${product.image_base64}`}
+                            src={`${product.images[0]}`}
                             alt={product.name || "Product"}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
@@ -656,7 +666,7 @@ export default function DashboardPage() {
           </Card>
         </div>
       </main>
-        {/* <Jarvis />     */}
+      {/* <Jarvis />     */}
       <Footer />
 
       {/* Edit Profile Modal */}
