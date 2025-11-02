@@ -45,7 +45,6 @@ export default function Step1Basics({
   const clerkId = user?.id;
 
   if (clerkId) localStorage.setItem("clerkId", clerkId);
-  const clerk_id = localStorage.getItem("clerkId");
 
   // ✅ Text-to-Speech helper
   const speak = (text: string) => {

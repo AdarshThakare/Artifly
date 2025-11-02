@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type JSX } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Bot,
@@ -37,10 +37,14 @@ declare global {
     interimResults: boolean;
     lang: string;
     maxAlternatives: number;
-    onstart: ((this: SpeechRecognition, ev: Event) => unknown) | null;
-    onend: ((this: SpeechRecognition, ev: Event) => unknown) | null;
-    onerror: ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => unknown) | null;
-    onresult: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => unknown) | null;
+    onStart: ((this: SpeechRecognition, ev: Event) => unknown) | null;
+    onEnd: ((this: SpeechRecognition, ev: Event) => unknown) | null;
+    onError:
+      | ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => unknown)
+      | null;
+    onResult:
+      | ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => unknown)
+      | null;
     start(): void;
     stop(): void;
     abort(): void;
@@ -75,7 +79,7 @@ declare global {
   }
 
   interface SpeechRecognitionErrorEvent extends Event {
-    readonly error: string;
+    readonly Error: string;
     readonly message: string;
   }
 }
@@ -116,13 +120,16 @@ type SubMode =
 
 export default function Chatbot() {
   const [isPanelOpen, setIsPanelOpen] = useState<boolean>(false);
+  //@ts-ignore
   const [response, setResponse] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
   const [isListening, setIsListening] = useState<boolean>(false);
   const [isRecognizing, setIsRecognizing] = useState<boolean>(false);
+  //@ts-ignore
   const [transcript, setTranscript] = useState<string>("");
   const [conversationHistory, setConversationHistory] = useState<Message[]>([]);
+  //@ts-ignore
   const [tooltipVisible, setTooltipVisible] = useState<string>("");
   const [mode, setMode] = useState<Mode>(null);
   const [subMode, setSubMode] = useState<SubMode>(null);
@@ -400,7 +407,8 @@ export default function Chatbot() {
         return null;
       }
 
-      const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const SpeechRecognitionAPI =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
       const recognition = new SpeechRecognitionAPI();
       recognition.lang = "en-US";
       recognition.interimResults = false;

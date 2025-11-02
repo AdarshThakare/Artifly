@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Mic, MicOff, Play, Pause } from "lucide-react";
 
 // Card & Button components as you already have
