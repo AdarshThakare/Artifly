@@ -1,3 +1,4 @@
+import { useUser } from "@clerk/clerk-react";
 import axios from "axios";
 import {
   Upload,
@@ -21,6 +22,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Jarvis from "../components/Jarvis";
 // import Jarvis from "../components/Jarvis.tsx"
 // Mock user data - replace with actual data from your backend
 const mockUser = {
@@ -351,13 +353,16 @@ export default function DashboardPage() {
   const [userData, setUserData] = useState<User>(mockUser);
 
   const navigate = useNavigate();
+  const { user } = useUser();
+  const firstName = user?.firstName;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const clerkId = user?.id;
         setLoading(true);
         const response = await axios.get(
-          "https://artifly-backend.onrender.com/api/v1/post/"
+          `https://artifly-backend.onrender.com/api/v1/post/${clerkId}`
         );
         setProducts(response.data.data);
       } catch (err) {
@@ -420,7 +425,7 @@ export default function DashboardPage() {
           <header className="mb-8 flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                Artisan Dashboard
+                {`${firstName}'s` || "Artisan"} Dashboard
               </h1>
               <p className="text-gray-600">
                 Manage your crafts and track your success
@@ -666,7 +671,7 @@ export default function DashboardPage() {
           </Card>
         </div>
       </main>
-      {/* <Jarvis />     */}
+      <Jarvis />
       <Footer />
 
       {/* Edit Profile Modal */}

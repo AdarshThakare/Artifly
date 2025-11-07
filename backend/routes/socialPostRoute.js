@@ -8,6 +8,7 @@ import {
   getAllSocialPosts,
   getSocialPostById,
   storeDescription,
+  getSocialPostsByClerkId,
 } from "../controllers/socialPostController.js";
 import upload from "../lib/multer.js";
 
@@ -23,7 +24,7 @@ router.post("/store-description/:postId", storeDescription);
 router.post("/store-image", upload.single("image"), storeImage);
 
 router.get("/", getAllSocialPosts);
-
+router.get("/:clerkId", getSocialPostsByClerkId);
 router.get("/:postId", getSocialPostById);
 
 export default router;

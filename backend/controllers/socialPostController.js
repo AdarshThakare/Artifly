@@ -126,3 +126,43 @@ export const getSocialPostById = async (req, res) => {
     res.status(500).json({ error: "Server error while fetching post" });
   }
 };
+
+export const getSocialPostsByClerkId = async (req, res) => {
+  try {
+    const { clerkId } = req.params;
+
+    if (!clerkId) {
+      return res.status(400).json({ message: "Clerk ID is required" });
+    }
+
+    // Step 1: Find the user by clerkId
+    const user = await User.findOne({ clerkId });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Step 2: Find all social posts by this user
+    const posts = await SocialPost.find({ user: user._id })
+      .sort({ createdAt: -1 }) // newest first
+      .lean();
+
+    if (posts.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No social posts found for this user" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      count: posts.length,
+      posts,
+    });
+  } catch (error) {
+    console.error("Error fetching posts by clerkId:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching social posts",
+    });
+  }
+};
