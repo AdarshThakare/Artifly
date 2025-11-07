@@ -197,11 +197,14 @@ export default function Step1Basics({
       const imageUrl = await uploadBase64ToCloudinary(image);
       const postId = localStorage.getItem("postId");
       // await fetch("http://localhost:3000/api/v1/post/store-image", {
-      await fetch("https://artifly-backend.onrender.com/api/v1/post/store-image", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ postId: postId, imageUrl }),
-      });
+      await fetch(
+        "https://artifly-backend.onrender.com/api/v1/post/store-image",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ postId: postId, imageUrl }),
+        }
+      );
     } catch (err) {
       console.error("Upload failed:", err);
     }
@@ -403,7 +406,7 @@ export default function Step1Basics({
                 </p>
                 <button
                   onClick={() =>
-                    speak("Upnney pasand ke title ka chunaav karein.")
+                    speak("Upnney pasand ke title ka chunaav karey.")
                   }
                 >
                   <Volume2 className="h-5 w-5 mt-4 text-gray-500 hover:text-blue-600 transition" />
@@ -411,21 +414,34 @@ export default function Step1Basics({
               </div>
               <div className="grid gap-3">
                 {[title, ...aiTitles].map((t, idx) => (
-                  <motion.button
-                    key={idx}
-                    onClick={() => {
-                      setSelectedTitle(t);
-                      speak(t);
-                    }}
-                    whileTap={{ scale: 0.97 }}
-                    className={`w-full md:grid md:grid-cols-2 text-left px-4 py-2 rounded-xl hover:border-2 hover:border-sky-500 border transition ${
-                      selectedTitle === t
-                        ? "bg-gradient-to-r from-blue-600 to-indigo-500 text-white border-blue-600 shadow"
-                        : "bg-white/70 dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:border-blue-500"
-                    }`}
-                  >
-                    {t}
-                  </motion.button>
+                  <div className="flex items-center gap-4">
+                    <motion.button
+                      key={idx}
+                      onClick={() => {
+                        setSelectedTitle(t);
+                      }}
+                      whileTap={{ scale: 0.97 }}
+                      className={`w-full md:grid md:grid-cols-2 text-left px-4 py-2 rounded-xl hover:border-2 hover:border-sky-500 border transition ${
+                        selectedTitle === t
+                          ? "bg-gradient-to-r from-blue-600 to-indigo-500 text-white border-blue-600 shadow"
+                          : "bg-white/70 dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:border-blue-500"
+                      }`}
+                    >
+                      {t}
+                    </motion.button>
+                    <motion.button
+                      key={idx}
+                      onClick={() => {
+                        speak(t);
+                      }}
+                      whileTap={{ scale: 0.97 }}
+                      className={`w-10 md:grid md:grid-cols-2 text-left px-2 py-2  hover:border-2 hover:from-blue-600! hover:to-indigo-600! border transition bg-gradient-to-r from-blue-600 rounded-full to-indigo-400 text-white border-blue-300 shadow"
+               
+                      `}
+                    >
+                      <Volume2 className="h-5 w-5  text-white  transition" />
+                    </motion.button>
+                  </div>
                 ))}
               </div>
             </motion.div>

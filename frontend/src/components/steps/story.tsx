@@ -2,8 +2,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Card } from "../Card";
 import { Button } from "../Button";
 import { VoiceRecorder } from "../VoiceRecorder";
-import { Tag, ArrowLeft, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { Tag, ArrowLeft, Sparkles, Volume2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import axios from "axios";
 
@@ -28,6 +28,12 @@ export default function Step2Story({
   const category = localStorage.getItem("category");
   const userTitle = localStorage.getItem("userTitle");
   const image = localStorage.getItem("ImageBase64");
+
+  useEffect(() => {
+    if (transcript && transcript.trim().length > 0) {
+      setTypedText(transcript);
+    }
+  }, [transcript]);
 
   function base64ToFile(base64String: string, filename: string) {
     const arr = base64String.split(",");
@@ -147,47 +153,47 @@ export default function Step2Story({
     }
   };
 
- const handleGenerate = async () => {
-  if (!typedText.trim()) {
-    alert("Please fill in the description first!");
-    return;
-  }
-  setLoading(true);
-
-  console.log("SELECTED", userTitle, location, category);
-  try {
-    const formData = new FormData();
-    
-    // ✅ REMOVE THE CONDITIONAL - Always append all fields
-    formData.append("user_title", userTitle || "");
-    formData.append("location", location || "");
-    formData.append("category", category || "");
-    formData.append("description", typedText);
-
-    const res = await axios.post(
-      "https://genai-exchange-llm-api-3.onrender.com/gen-stories",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    console.log("Response", res.data);
-    if (res.data.success) {
-      console.log("Generated Titles:", res.data.data.stories);
-      setAiDescriptions(res.data.data.stories);
-    } else {
-      console.error("Backend error:", res.data.message);
+  const handleGenerate = async () => {
+    const storyText = transcript.trim() || typedText.trim();
+    if (!storyText) {
+      alert("Please provide your story (via voice or typing) first!");
+      return;
     }
-  } catch (err) {
-    console.error("Error fetching AI titles:", err);
-  } finally {
-    setLoading(false);
-  }
-};
+    setLoading(true);
 
+    console.log("SELECTED", userTitle, location, category);
+    try {
+      const formData = new FormData();
+
+      // ✅ REMOVE THE CONDITIONAL - Always append all fields
+      formData.append("user_title", userTitle || "");
+      formData.append("location", location || "");
+      formData.append("category", category || "");
+      formData.append("description", storyText);
+
+      const res = await axios.post(
+        "https://genai-exchange-llm-api-3.onrender.com/gen-stories",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("Response", res.data);
+      if (res.data.success) {
+        console.log("Generated Titles:", res.data.data.stories);
+        setAiDescriptions(res.data.data.stories);
+      } else {
+        console.error("Backend error:", res.data.message);
+      }
+    } catch (err) {
+      console.error("Error fetching AI titles:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <motion.div
@@ -216,7 +222,11 @@ export default function Step2Story({
         <textarea
           value={typedText}
           onChange={(e) => setTypedText(e.target.value)}
-          placeholder="Type your story here..."
+          placeholder={
+            transcript
+              ? "Transcribed text from your voice will appear here..."
+              : "Type your story here..."
+          }
           className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           rows={5}
         />
@@ -249,99 +259,139 @@ export default function Step2Story({
                 Choose Your Enhanced Story-telling Description:
               </p>
               <div className="grid gap-3">
-               {[typedText, ...aiDescriptions].map((t, idx) => (
-  <motion.button
-    key={idx}
-    onClick={async () => {
-      console.log("🔘 Description clicked:", t);
-      
-      setSelectedDescription(t);
-      
-      if (!t || !t.trim()) {
-        alert("Description is empty!");
-        return;
-      }
-      
-      setLoading(true);
-      
-      const image = localStorage.getItem("ImageBase64");
-      const location = localStorage.getItem("location");
-      const category = localStorage.getItem("category");
-      const userTitle = localStorage.getItem("userTitle");
-      
-      if (!image) {
-        console.error("❌ Image not found!");
-        alert("Image is missing. Please go back.");
-        setLoading(false);
-        return;
-      }
+                {[typedText, ...aiDescriptions].map((t, idx) => (
+                  <div className="flex items-center gap-4">
+                    <motion.button
+                      key={idx}
+                      onClick={async () => {
+                        console.log("🔘 Description clicked:", t);
 
-      console.log("📦 Sending data:", { userTitle, location, category, descriptionLength: t.length });
+                        setSelectedDescription(t);
 
-      try {
-        const file = base64ToFile(image, "product.png");
-        
-        const formData = new FormData();
-        formData.append("image", file);
-        formData.append("title", userTitle || "");
-        formData.append("description", t);
-        formData.append("category", category || "");
-        formData.append("location", location || "");
+                        if (!t || !t.trim()) {
+                          alert("Description is empty!");
+                          return;
+                        }
 
-        console.log("📤 Sending request to gen-tags-captions...");
+                        setLoading(true);
 
-        const res = await axios.post(
-          "https://genai-exchange-llm-api-3.onrender.com/gen-tags-captions",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+                        const image = localStorage.getItem("ImageBase64");
+                        const location = localStorage.getItem("location");
+                        const category = localStorage.getItem("category");
+                        const userTitle = localStorage.getItem("userTitle");
 
-        console.log("✅ API Response:", res.data);
-        
-        if (res.data.success && res.data.data) {
-          const postContents = {
-            captions: res.data.data.captions || [],
-            hashtags: res.data.data.hashtags || [],
-            seo_tags: res.data.data.seo_tags || [],
-            description: t
-          };
-          
-          localStorage.setItem("postContents", JSON.stringify(postContents));
-          localStorage.setItem("story", t);
-          
-          console.log("✅ Data stored in localStorage:", postContents);
-          console.log("📊 Captions count:", postContents.captions.length);
-          console.log("📊 Hashtags count:", postContents.hashtags.length);
-          
-          alert(`✅ Generated ${postContents.captions.length} captions successfully!`);
-          
-        } else {
-          console.error("❌ Backend returned no data");
-          alert("Error: No captions generated");
-        }
-      } catch (err: any) {
-        console.error("❌ API Error:", err);
-        console.error("Error details:", err.response?.data);
-        alert(`Failed: ${err.response?.data?.message || err.message}`);
-      } finally {
-        setLoading(false);
-      }
-    }}
-    disabled={loading}
-    whileTap={{ scale: 0.97 }}
-    className={`w-full text-left px-4 my-2 hover:border-2 hover:border-sky-500 py-2 rounded-xl border transition ${
-      selectedDescription === t
-        ? "bg-gradient-to-r from-blue-600 to-indigo-500 text-white border-blue-600 shadow"
-        : "bg-white/70 dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:border-blue-500"
-    }`}
-  >
-    {loading && selectedDescription === t ? "Generating captions..." : t}
-  </motion.button>
-))}
+                        if (!image) {
+                          console.error("❌ Image not found!");
+                          alert("Image is missing. Please go back.");
+                          setLoading(false);
+                          return;
+                        }
+
+                        console.log("📦 Sending data:", {
+                          userTitle,
+                          location,
+                          category,
+                          descriptionLength: t.length,
+                        });
+
+                        try {
+                          const file = base64ToFile(image, "product.png");
+
+                          const formData = new FormData();
+                          formData.append("image", file);
+                          formData.append("title", userTitle || "");
+                          formData.append("description", t);
+                          formData.append("category", category || "");
+                          formData.append("location", location || "");
+
+                          console.log(
+                            "📤 Sending request to gen-tags-captions..."
+                          );
+
+                          const res = await axios.post(
+                            "https://genai-exchange-llm-api-3.onrender.com/gen-tags-captions",
+                            formData,
+                            {
+                              headers: {
+                                "Content-Type": "multipart/form-data",
+                              },
+                            }
+                          );
+
+                          console.log("✅ API Response:", res.data);
+
+                          if (res.data.success && res.data.data) {
+                            const postContents = {
+                              captions: res.data.data.captions || [],
+                              hashtags: res.data.data.hashtags || [],
+                              seo_tags: res.data.data.seo_tags || [],
+                              description: t,
+                            };
+
+                            localStorage.setItem(
+                              "postContents",
+                              JSON.stringify(postContents)
+                            );
+                            localStorage.setItem("story", t);
+
+                            console.log(
+                              "✅ Data stored in localStorage:",
+                              postContents
+                            );
+                            console.log(
+                              "📊 Captions count:",
+                              postContents.captions.length
+                            );
+                            console.log(
+                              "📊 Hashtags count:",
+                              postContents.hashtags.length
+                            );
+
+                            alert(
+                              `✅ Generated ${postContents.captions.length} captions successfully!`
+                            );
+                          } else {
+                            console.error("❌ Backend returned no data");
+                            alert("Error: No captions generated");
+                          }
+                        } catch (err: any) {
+                          console.error("❌ API Error:", err);
+                          console.error("Error details:", err.response?.data);
+                          alert(
+                            `Failed: ${
+                              err.response?.data?.message || err.message
+                            }`
+                          );
+                        } finally {
+                          setLoading(false);
+                        }
+                      }}
+                      disabled={loading}
+                      whileTap={{ scale: 0.97 }}
+                      className={`w-full text-left px-4 my-2 hover:border-2 hover:border-sky-500 py-2 rounded-xl border transition ${
+                        selectedDescription === t
+                          ? "bg-gradient-to-r from-blue-600 to-indigo-500 text-white border-blue-600 shadow"
+                          : "bg-white/70 dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:border-blue-500"
+                      }`}
+                    >
+                      {loading && selectedDescription === t
+                        ? "Generating captions..."
+                        : t}
+                    </motion.button>
+                    <motion.button
+                      key={idx}
+                      onClick={() => {
+                        speak(t);
+                      }}
+                      whileTap={{ scale: 0.97 }}
+                      className={`w-10 md:grid md:grid-cols-2 text-left px-2 py-2  hover:border-2 hover:from-blue-600! hover:to-indigo-600! border transition bg-gradient-to-r from-blue-600 rounded-full to-indigo-400 text-white border-blue-300 shadow"
+               
+                      `}
+                    >
+                      <Volume2 className="h-5 w-5  text-white  transition" />
+                    </motion.button>
+                  </div>
+                ))}
               </div>
             </motion.div>
           )}
@@ -352,44 +402,46 @@ export default function Step2Story({
             <ArrowLeft className="h-4 w-4 mr-2" /> Previous
           </Button>
 
-       <Button
-  onClick={async () => {
-    const finalStory = selectedDescription || typedText;
+          <Button
+            onClick={async () => {
+              const finalStory =
+                selectedDescription || transcript.trim() || typedText.trim();
 
-    if (!finalStory.trim()) {
-      alert("Please select or type a description before proceeding!");
-      return;
-    }
+              if (!finalStory.trim()) {
+                alert("Please select or type a description before proceeding!");
+                return;
+              }
 
-    // ✅ CHECK if captions were generated
-    const postContents = localStorage.getItem("postContents");
-    if (!postContents) {
-      alert("⚠️ Please click on one of the descriptions to generate captions before proceeding!");
-      return;
-    }
+              // ✅ CHECK if captions were generated
+              const postContents = localStorage.getItem("postContents");
+              if (!postContents) {
+                alert(
+                  "⚠️ Please click on one of the descriptions to generate captions before proceeding!"
+                );
+                return;
+              }
 
-    localStorage.setItem("story", finalStory);
-    
-    console.log("📝 Navigating with data:", {
-      story: finalStory,
-      hasPostContents: !!postContents
-    });
-    
-    try {
-      await storeDescription();
-      await storeData(finalStory);
-      console.log("✅ Story saved");
-      onNext();
-    } catch (err) {
-      console.error("❌ Failed to save story:", err);
-      alert("Failed to save story. Please try again.");
-    }
-  }}
-  disabled={!selectedDescription && !typedText.trim()}
->
-  Next
-</Button>
+              localStorage.setItem("story", finalStory);
 
+              console.log("📝 Navigating with data:", {
+                story: finalStory,
+                hasPostContents: !!postContents,
+              });
+
+              try {
+                await storeDescription();
+                await storeData(finalStory);
+                console.log("✅ Story saved");
+                onNext();
+              } catch (err) {
+                console.error("❌ Failed to save story:", err);
+                alert("Failed to save story. Please try again.");
+              }
+            }}
+            disabled={!selectedDescription && !typedText.trim()}
+          >
+            Next
+          </Button>
         </div>
       </Card>
     </motion.div>
