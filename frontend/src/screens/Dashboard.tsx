@@ -127,7 +127,7 @@ const Button = ({
 const Footer = () => (
   <footer className="bg-white border-t border-gray-200 py-6 mt-auto">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-600 text-sm">
-      © 2024 Artisan Platform. All rights reserved.
+      © 2025 Artisan Platform. All rights reserved.
     </div>
   </footer>
 );
@@ -364,7 +364,7 @@ export default function DashboardPage() {
         const response = await axios.get(
           `https://artifly-backend.onrender.com/api/v1/post/${clerkId}`
         );
-        setProducts(response.data.data);
+        setProducts(response.data?.posts);
       } catch (err) {
         setProducts([]);
         console.log(err);
@@ -531,7 +531,11 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle>
-                <span>Your Products ({products.length})</span>
+                {products ? (
+                  <span>Your Products ({products.length})</span>
+                ) : (
+                  <span>Your Products : 0</span>
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent>
