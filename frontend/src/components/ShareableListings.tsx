@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Share2,
   Mail,
@@ -14,79 +14,123 @@ import {
   Copy,
   Check,
   ChevronRight,
+  Link,
+  Link2,
 } from "lucide-react";
+import { useUser } from "@clerk/clerk-react";
+import axios from "axios";
 
-// Mock product data for demonstration
-const mockProducts = [
-  {
-    _id: "1",
-    name: "Handcrafted Ceramic Vase",
-    category: "Pottery",
-    location: "Mumbai, India",
-    description:
-      "A beautiful handcrafted ceramic vase with intricate patterns inspired by traditional Indian motifs. Each piece is unique and made with love.",
-    title: "Artisan Ceramic Vase",
-    story:
-      "This vase represents 3 generations of pottery craftsmanship passed down in my family.",
-    caption: "Bringing traditional art to modern homes",
-    hashtags: ["handmade", "pottery", "homedecor"],
-    seo_tags: ["ceramic", "vase", "handcrafted", "indian"],
-    images: [
-      "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=800",
-    ],
-    pricePerPiece: 1499,
-    totalCollected: 14990,
-    updatedAt: "2024-01-15T10:30:00Z",
-  },
-  {
-    _id: "2",
-    name: "Silk Embroidered Scarf",
-    category: "Textiles",
-    location: "Varanasi, India",
-    description:
-      "Pure silk scarf with hand embroidery. Features delicate floral patterns that take 40+ hours to complete.",
-    title: "Luxury Silk Scarf",
-    story: "Each stitch tells a story of dedication and artistic passion.",
-    caption: "Wearable art for the modern woman",
-    hashtags: ["silk", "embroidery", "fashion"],
-    seo_tags: ["scarf", "silk", "handembroidered"],
-    images: [
-      "https://images.unsplash.com/photo-1601924994987-69e26d50dc26?w=800",
-    ],
-    pricePerPiece: 2999,
-    totalCollected: 29990,
-    updatedAt: "2024-01-10T14:20:00Z",
-  },
-  {
-    _id: "3",
-    name: "Terracotta Wall Art",
-    category: "Pottery",
-    location: "Jaipur, India",
-    description:
-      "Traditional terracotta wall hanging with painted details. Perfect for adding rustic charm to any space.",
-    title: "Terracotta Masterpiece",
-    story: "Inspired by the rich heritage of Rajasthani art forms.",
-    caption: "Transform your walls with tradition",
-    hashtags: ["terracotta", "wallart", "homedecor"],
-    seo_tags: ["wall hanging", "terracotta", "indian art"],
-    images: [
-      "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800",
-    ],
-    pricePerPiece: 899,
-    totalCollected: 7192,
-    updatedAt: "2024-01-05T09:15:00Z",
-  },
-];
+interface Product {
+  _id: string;
+  name: string;
+  category: string;
+  location: string;
+  description: string;
+  title: string;
+  story: string;
+  caption: string;
+  hashtags: string[];
+  seo_tags: string[];
+  images: string[];
+  user: string;
+  pricePerPiece: number;
+  updatedAt: string;
+  totalCollected: number;
+  itemsSold: number;
+}
+
+// // Mock product data for demonstration
+// const mockProducts = [
+//   {
+//     _id: "1",
+//     name: "Handcrafted Ceramic Vase",
+//     category: "Pottery",
+//     location: "Mumbai, India",
+//     description:
+//       "A beautiful handcrafted ceramic vase with intricate patterns inspired by traditional Indian motifs. Each piece is unique and made with love.",
+//     title: "Artisan Ceramic Vase",
+//     story:
+//       "This vase represents 3 generations of pottery craftsmanship passed down in my family.",
+//     caption: "Bringing traditional art to modern homes",
+//     hashtags: ["handmade", "pottery", "homedecor"],
+//     seo_tags: ["ceramic", "vase", "handcrafted", "indian"],
+//     images: [
+//       "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=800",
+//     ],
+//     pricePerPiece: 1499,
+//     totalCollected: 14990,
+//     updatedAt: "2024-01-15T10:30:00Z",
+//   },
+//   {
+//     _id: "2",
+//     name: "Silk Embroidered Scarf",
+//     category: "Textiles",
+//     location: "Varanasi, India",
+//     description:
+//       "Pure silk scarf with hand embroidery. Features delicate floral patterns that take 40+ hours to complete.",
+//     title: "Luxury Silk Scarf",
+//     story: "Each stitch tells a story of dedication and artistic passion.",
+//     caption: "Wearable art for the modern woman",
+//     hashtags: ["silk", "embroidery", "fashion"],
+//     seo_tags: ["scarf", "silk", "handembroidered"],
+//     images: [
+//       "https://images.unsplash.com/photo-1601924994987-69e26d50dc26?w=800",
+//     ],
+//     pricePerPiece: 2999,
+//     totalCollected: 29990,
+//     updatedAt: "2024-01-10T14:20:00Z",
+//   },
+//   {
+//     _id: "3",
+//     name: "Terracotta Wall Art",
+//     category: "Pottery",
+//     location: "Jaipur, India",
+//     description:
+//       "Traditional terracotta wall hanging with painted details. Perfect for adding rustic charm to any space.",
+//     title: "Terracotta Masterpiece",
+//     story: "Inspired by the rich heritage of Rajasthani art forms.",
+//     caption: "Transform your walls with tradition",
+//     hashtags: ["terracotta", "wallart", "homedecor"],
+//     seo_tags: ["wall hanging", "terracotta", "indian art"],
+//     images: [
+//       "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800",
+//     ],
+//     pricePerPiece: 899,
+//     totalCollected: 7192,
+//     updatedAt: "2024-01-05T09:15:00Z",
+//   },
+// ];
 
 const ShareableListings = () => {
-  const [products] = useState(mockProducts);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [showQRModal, setShowQRModal] = useState(false);
   const [qrProduct, setQrProduct] = useState<any>(null);
   const [copied, setCopied] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const { user } = useUser();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const clerkId = user?.id;
+        setLoading(true);
+        const response = await axios.get(
+          `https://artifly-backend.onrender.com/api/v1/post/${clerkId}`
+        );
+        setProducts(response.data?.posts);
+      } catch (err) {
+        setProducts([]);
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const generateShareableLink = (productId: any) => {
-    return `${window.location.origin}/product/${productId}`;
+    return `https://artifly-backend.onrender.com/product/${productId}`;
   };
 
   const copyToClipboard = (text: any) => {
@@ -175,7 +219,7 @@ const ShareableListings = () => {
                           x{" "}
                         </span>
                         <span className="flex items-center text-md tracking-wider  md:hidden">
-                          2{" "}
+                          {product.itemsSold}{" "}
                         </span>
                         <span className="flex items-center text-md tracking-wider  md:hidden ">
                           ={" "}
@@ -212,12 +256,12 @@ const ShareableListings = () => {
                       copyToClipboard(generateShareableLink(product._id));
                     }}
                     className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                    title="Copy link"
+                    title="Generate Shareable link"
                   >
                     {copied ? (
-                      <Check className="h-4 w-4 text-green-600" />
+                      <Check className="h-5 w-5 text-green-600" />
                     ) : (
-                      <Copy className="h-4 w-4" />
+                      <Link2 className="h-6 w-6" />
                     )}
                   </button>
                   <button
@@ -228,7 +272,7 @@ const ShareableListings = () => {
                     className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                     title="Generate QR Code"
                   >
-                    <QrCode className="h-4 w-4" />
+                    <QrCode className="h-5 w-5" />
                   </button>
                   <button
                     onClick={(e) => {
@@ -238,9 +282,9 @@ const ShareableListings = () => {
                     className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                     title="Share via email"
                   >
-                    <Mail className="h-4 w-4" />
+                    <Mail className="h-5 w-5" />
                   </button>
-                  <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-gray-600" />
+                  <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600" />
                 </div>
               </div>
             </div>
@@ -250,7 +294,7 @@ const ShareableListings = () => {
 
       {/* Product Detail Modal */}
       {selectedProduct && (
-        <div className=" fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm">
+        <div className=" fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0005] bg-opacity-50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
             <div className="relative">
               {/* Close Button */}

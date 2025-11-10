@@ -66,7 +66,7 @@ const socialPostSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    TotalPriceCollected: {
+    totalCollected: {
       type: Number,
       default: 0,
     },
@@ -78,7 +78,7 @@ const socialPostSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    itemSold: {
+    itemsSold: {
       type: Number,
       default: 0,
     },
