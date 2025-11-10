@@ -81,7 +81,7 @@ const SocialPosts = () => {
         const clerkId = user?.id;
         setLoading(true);
         const response = await axios.get(
-          `http://localhost:3000/api/v1/post/${clerkId}`
+          `https://artifly-backend.onrender.com/api/v1/post/${clerkId}`
         );
         const posts = response.data?.posts || [];
         setProducts(posts);
@@ -147,9 +147,12 @@ const SocialPosts = () => {
       setEditingPriceId(null);
 
       // Persist to backend
-      await axios.patch(`http://localhost:3000/api/v1/post/${productId}`, {
-        pricePerPiece: tempPrice,
-      });
+      await axios.patch(
+        `https://artifly-backend.onrender.com/api/v1/post/${productId}`,
+        {
+          pricePerPiece: tempPrice,
+        }
+      );
     } catch (err) {
       console.error("Failed to update price:", err);
     }
@@ -175,7 +178,7 @@ const SocialPosts = () => {
     if (!currentEditPost) return;
     try {
       const response = await axios.patch(
-        `http://localhost:3000/api/v1/post/${currentEditPost._id}`,
+        `https://artifly-backend.onrender.com/api/v1/post/${currentEditPost._id}`,
         editForm
       );
 
@@ -194,7 +197,9 @@ const SocialPosts = () => {
   const handleDeletePost = async (postId: string) => {
     if (!confirm("Are you sure you want to delete this post?")) return;
     try {
-      await axios.delete(`http://localhost:3000/api/v1/post/${postId}`);
+      await axios.delete(
+        `https://artifly-backend.onrender.com/api/v1/post/${postId}`
+      );
       setProducts((prev) => prev.filter((p) => p._id !== postId));
     } catch (err) {
       console.error("Error deleting post:", err);

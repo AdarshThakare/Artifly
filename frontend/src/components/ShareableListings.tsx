@@ -130,7 +130,7 @@ const ShareableListings = () => {
   }, [user]);
 
   const generateShareableLink = (productId: any) => {
-    return `http://localhost:5173/product/${productId}`;
+    return `https://artifly-seven.vercel.app//product/${productId}`;
   };
 
   const copyToClipboard = (text: any) => {
