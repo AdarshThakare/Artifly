@@ -443,7 +443,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <Upload className="h-6 w-6 text-blue-600" />
-                    Upload New Product
+                    Upload New Social Post
                   </span>
                   <Button
                     onClick={() => {
@@ -451,7 +451,7 @@ export default function DashboardPage() {
                     }}
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Add Product
+                    Add Product Post
                   </Button>
                 </div>
               </CardTitle>

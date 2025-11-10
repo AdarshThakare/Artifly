@@ -360,7 +360,7 @@ export default function PreviewPage({
                   </h3>
                   <div className="space-y-3">
                     {captions.map((cap, idx) => (
-                      <div className="flex items-center gap-4" key={idx}>
+                      <div className="flex items-center gap-4 " key={idx}>
                         <motion.div
                           whileTap={{ scale: 0.97 }}
                           className={`cursor-pointer p-4 rounded-xl border transition-all ${
@@ -391,11 +391,11 @@ export default function PreviewPage({
                             speak(cap);
                           }}
                           whileTap={{ scale: 0.97 }}
-                          className={`w-10 md:grid md:grid-cols-2 text-left px-2 py-2  hover:border-2 hover:from-blue-600! hover:to-indigo-600! border transition bg-gradient-to-r from-blue-600 rounded-full to-indigo-400 text-white border-blue-300 shadow"
+                          className={`w-10! md:grid md:grid-cols-2 text-left px-4 py-2  hover:border-2 hover:from-blue-600! hover:to-indigo-600! border transition bg-gradient-to-r from-blue-600 rounded-full to-indigo-400 text-white border-blue-300 shadow"
                                      
                                             `}
                         >
-                          <Volume2 className="h-5 w-5  text-white  transition" />
+                          <Volume2 className="h-5 w-5 relative right-2 text-white  transition" />
                         </motion.button>
                       </div>
                     ))}
@@ -488,7 +488,7 @@ export default function PreviewPage({
             transition={{ duration: 0.4 }}
           >
             <div className="w-full h-full bg-gray-900 rounded-[2rem] p-1">
-              <div className="w-full h-full bg-gray-100 dark:bg-gray-900 rounded-[1.5rem] overflow-hidden relative">
+              <div className="w-full h-full bg-gray-100 dark:bg-gray-900 rounded-[1.8rem] overflow-hidden relative">
                 {/* Notch */}
                 <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-10"></div>
 

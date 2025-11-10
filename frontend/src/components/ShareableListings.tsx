@@ -110,27 +110,27 @@ const ShareableListings = () => {
   const [loading, setLoading] = useState(true);
 
   const { user } = useUser();
+  const fetchData = async () => {
+    try {
+      const clerkId = user?.id;
+      setLoading(true);
+      const response = await axios.get(
+        `https://artifly-backend.onrender.com/api/v1/post/${clerkId}`
+      );
+      setProducts(response.data?.posts);
+    } catch (err) {
+      setProducts([]);
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const clerkId = user?.id;
-        setLoading(true);
-        const response = await axios.get(
-          `https://artifly-backend.onrender.com/api/v1/post/${clerkId}`
-        );
-        setProducts(response.data?.posts);
-      } catch (err) {
-        setProducts([]);
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
-  }, []);
+  }, [user]);
 
   const generateShareableLink = (productId: any) => {
-    return `https://artifly-backend.onrender.com/product/${productId}`;
+    return `http://localhost:5173/product/${productId}`;
   };
 
   const copyToClipboard = (text: any) => {
@@ -175,7 +175,12 @@ const ShareableListings = () => {
   return (
     <div className="mt-10 space-y-6">
       {/* Shareable Listings Section */}
-      <div className="bg-white rounded-lg shadow">
+      <div
+        className="bg-white rounded-lg shadow"
+        onClick={() => {
+          fetchData;
+        }}
+      >
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 flex items-center">
             <Share2 className="h-6 w-6 mr-2 text-blue-600 mb-1" />
@@ -239,13 +244,13 @@ const ShareableListings = () => {
                     x{" "}
                   </span>
                   <span className="flex items-center text-lg tracking-wider">
-                    1
+                    {0}{" "}
                   </span>
                   <span className="flex items-center text-lg tracking-wider ">
                     ={" "}
                   </span>
                   <span className="font-medium text-green-600 text-lg tracking-wider">
-                    {formatCurrency(product.totalCollected)}
+                    {formatCurrency(0)}
                   </span>
                 </div>
 
@@ -295,7 +300,7 @@ const ShareableListings = () => {
       {/* Product Detail Modal */}
       {selectedProduct && (
         <div className=" fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0005] bg-opacity-50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden">
             <div className="relative">
               {/* Close Button */}
               <button
@@ -311,7 +316,7 @@ const ShareableListings = () => {
                   <img
                     src={selectedProduct.images[0]}
                     alt={selectedProduct.name}
-                    className="w-full h-auto max-h-96 object-contain rounded-lg shadow-md"
+                    className="w-full h-auto  object-contain rounded-lg shadow-md"
                   />
                 </div>
 
@@ -324,9 +329,7 @@ const ShareableListings = () => {
                         {selectedProduct.name}
                       </h2>
                     </div>
-                    <p className="text-3xl font-bold text-blue-600 mb-3">
-                      {formatCurrency(selectedProduct.pricePerPiece)}
-                    </p>
+
                     <div className="flex items-center space-x-4 text-sm text-gray-500">
                       <span className="flex items-center">
                         <MapPin className="h-4 w-4 mr-1 text-green-500" />
@@ -419,18 +422,18 @@ const ShareableListings = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-xs text-gray-500 mb-1">
-                          Total Collected
+                          Price per piece
                         </p>
-                        <p className="text-lg font-bold text-green-600">
-                          {formatCurrency(selectedProduct.totalCollected)}
+                        <p className="text-xl font-bold text-green-600">
+                          {formatCurrency(selectedProduct.pricePerPiece)}
                         </p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">
                           Last Updated
                         </p>
-                        <p className="text-sm text-gray-700 flex items-center">
-                          <Calendar className="h-3 w-3 mr-1" />
+                        <p className="text-md text-gray-700 flex items-center">
+                          <Calendar className="h-4 w-4 mr-1 mb-1" />
                           {formatDate(selectedProduct.updatedAt)}
                         </p>
                       </div>
@@ -486,7 +489,7 @@ const ShareableListings = () => {
 
       {/* QR Code Modal */}
       {showQRModal && qrProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0006] bg-opacity-50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
             <button
               onClick={() => setShowQRModal(false)}

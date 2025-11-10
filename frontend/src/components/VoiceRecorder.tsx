@@ -144,7 +144,7 @@ export function VoiceRecorder({
       formData.append("audio", blob, "recording.webm");
 
       const res = await axios.post(
-        "https://artifly-backend.onrender.com/api/transcribe",
+        "http://localhost:3000/api/transcribe",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

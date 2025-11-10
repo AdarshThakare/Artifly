@@ -373,9 +373,7 @@ export default function Step2Story({
                           : "bg-white/70 dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:border-blue-500"
                       }`}
                     >
-                      {loading && selectedDescription === t
-                        ? "Generating captions..."
-                        : t}
+                      {loading && selectedDescription === t ? t : t}
                     </motion.button>
                     <motion.button
                       key={idx}

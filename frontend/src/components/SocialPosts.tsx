@@ -171,7 +171,7 @@ const SocialPosts = () => {
     setEditForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSaveEdit = async () => {
+  const handleSaveEdit = async (currentEditPost: Product) => {
     if (!currentEditPost) return;
     try {
       const response = await axios.patch(
@@ -179,7 +179,8 @@ const SocialPosts = () => {
         editForm
       );
 
-      const updatedPost = response.data.data;
+      const updatedPost = response.data.post;
+      console.log(updatedPost);
       setProducts((prev) =>
         prev.map((p) => (p._id === updatedPost._id ? updatedPost : p))
       );
@@ -225,7 +226,7 @@ const SocialPosts = () => {
           <div className="text-center py-12">
             <ImageIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500">
-              No products yet. Add your first product to get started!
+              No social posts yet. Add your first Post to get started!
             </p>
           </div>
         ) : (
@@ -286,7 +287,8 @@ const SocialPosts = () => {
                   <div className="space-y-1 mb-3 mt-3">
                     <div className="flex items-center text-sm text-gray-500">
                       <Tag className="h-3 w-3 mr-1 text-blue-500" />
-                      {product.category}
+                      {product.category.charAt(0).toUpperCase() +
+                        product.category.slice(1)}
                     </div>
                     <div className="flex items-center text-sm text-gray-500">
                       <MapPin className="h-3 w-3 mr-1 text-green-500" />
@@ -355,7 +357,7 @@ const SocialPosts = () => {
       {/* 🟩 Edit Modal */}
       {isModalOpen && currentEditPost && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-lg relative shadow-xl">
+          <div className="bg-white rounded-xl p-6 w-full max-w-3xl relative shadow-xl">
             <button
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
               onClick={() => setIsModalOpen(false)}
@@ -363,54 +365,72 @@ const SocialPosts = () => {
               <X className="w-5 h-5" />
             </button>
 
-            <h2 className="text-lg font-semibold mb-4">
+            <h2 className="text-xl font-semibold mb-4">
               Edit Post: {currentEditPost.name}
             </h2>
 
             <div className="space-y-3">
-              <input
-                name="name"
-                value={editForm.name || ""}
-                onChange={handleEditChange}
-                placeholder="Name"
-                className="w-full border rounded-md px-3 py-2"
-              />
-              <input
-                name="category"
-                value={editForm.category || ""}
-                onChange={handleEditChange}
-                placeholder="Category"
-                className="w-full border rounded-md px-3 py-2"
-              />
-              <input
-                name="location"
-                value={editForm.location || ""}
-                onChange={handleEditChange}
-                placeholder="Location"
-                className="w-full border rounded-md px-3 py-2"
-              />
-              <textarea
-                name="description"
-                value={editForm.description || ""}
-                onChange={handleEditChange}
-                placeholder="Description"
-                className="w-full border rounded-md px-3 py-2"
-              />
-              <textarea
-                name="caption"
-                value={editForm.caption || ""}
-                onChange={handleEditChange}
-                placeholder="Caption"
-                className="w-full border rounded-md px-3 py-2"
-              />
-              <input
-                name="pricePerPiece"
-                type="number"
-                value={editForm.pricePerPiece || 0}
-                onChange={handleEditChange}
-                placeholder="Price per piece"
-                className="w-full border rounded-md px-3 py-2"
-              />
+              <div>
+                <h2 className="text-md text-yellow-600 font-outfit! tracking-wider">
+                  Name -{" "}
+                </h2>
+                <input
+                  name="name"
+                  value={editForm.name || ""}
+                  onChange={handleEditChange}
+                  placeholder="Name"
+                  className="w-full border rounded-md px-3 py-2"
+                />
+              </div>
+              <div>
+                <h2 className="text-md text-yellow-600 font-outfit! tracking-wider">
+                  Location -{" "}
+                </h2>
+                <input
+                  name="location"
+                  value={editForm.location || ""}
+                  onChange={handleEditChange}
+                  placeholder="Location"
+                  className="w-full border rounded-md px-3 py-2"
+                />
+              </div>
+              <div>
+                <h2 className="text-md text-yellow-600 font-outfit! tracking-wider">
+                  Description -{" "}
+                </h2>
+                <textarea
+                  name="description"
+                  value={editForm.story || ""}
+                  onChange={handleEditChange}
+                  placeholder="Description"
+                  className="w-full border rounded-md px-3 py-2"
+                />
+              </div>
+              <div>
+                <h2 className="text-md text-yellow-600 font-outfit! tracking-wider">
+                  Caption -{" "}
+                </h2>
+                <textarea
+                  name="caption"
+                  value={editForm.caption || ""}
+                  onChange={handleEditChange}
+                  placeholder="Caption"
+                  className="w-full border rounded-md px-3 py-2"
+                />
+              </div>
+              <div>
+                <h2 className="text-md text-yellow-600 font-outfit! tracking-wider">
+                  Price per piece (INR)-{" "}
+                </h2>
+                <input
+                  name="pricePerPiece"
+                  type="number"
+                  value={editForm.pricePerPiece || 0}
+                  onChange={handleEditChange}
+                  placeholder="Price per piece"
+                  className="w-full border rounded-md px-3 py-2"
+                />
+              </div>
             </div>
 
             <div className="mt-5 flex justify-end space-x-3">
@@ -421,7 +441,7 @@ const SocialPosts = () => {
                 Cancel
               </Button>
               <Button
-                onClick={handleSaveEdit}
+                onClick={() => handleSaveEdit(currentEditPost)}
                 className="bg-blue-600 text-white hover:bg-blue-700"
               >
                 Save Changes

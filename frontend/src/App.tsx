@@ -4,6 +4,7 @@ import DashboardPage from "./screens/Dashboard";
 import OnboardingPage from "./screens/Onboarding";
 import HomePage from "./screens/Home";
 import ProtectedRoute from "./screens/ProtectedRoute";
+import ShareableProductPage from "./screens/ProductsPage";
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/product/:id" element={<ShareableProductPage />} />
         </Routes>
       </div>
     </div>
