@@ -27,7 +27,7 @@ router.post("/store-image", upload.single("image"), storeImage);
 
 router.get("/", getAllSocialPosts);
 router.get("/:clerkId", getSocialPostsByClerkId);
-router.get("/:postId", getSocialPostById);
+router.get("/product/:postId", getSocialPostById);
 
 router.patch("/:postId", EditSocialPost);
 router.put("/:postId", EditSocialPost);

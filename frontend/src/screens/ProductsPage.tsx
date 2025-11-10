@@ -83,7 +83,7 @@ const ShareableProductPage = () => {
 
       // Replace with your actual API endpoint
       const response = await axios.get(
-        `https://artifly-backend.onrender.com/api/v1/post/${id}`
+        `https://artifly-backend.onrender.com/api/v1/post/product/${id}`
       );
 
       setProduct(response.data?.product || response.data);
