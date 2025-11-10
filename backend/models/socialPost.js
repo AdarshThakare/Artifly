@@ -58,6 +58,30 @@ const socialPostSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    pricePerPiece: {
+      type: Number,
+      default: 0,
+    },
+    available: {
+      type: Boolean,
+      default: true,
+    },
+    TotalPriceCollected: {
+      type: Number,
+      default: 0,
+    },
+    likes: {
+      type: Number,
+      default: 0,
+    },
+    views: {
+      type: Number,
+      default: 0,
+    },
+    itemSold: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

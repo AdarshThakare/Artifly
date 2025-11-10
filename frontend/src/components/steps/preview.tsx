@@ -10,6 +10,7 @@ import {
   Bookmark,
   MoreHorizontal,
   Globe,
+  Volume2,
 } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
 import axios from "axios";
@@ -73,56 +74,68 @@ export default function PreviewPage({
     }
   };
 
-  useEffect(() => {
-  // Read from localStorage
-  const storedPostContents = localStorage.getItem("postContents");
-  const storedTitle = localStorage.getItem("userTitle");
-  const storedCategory = localStorage.getItem("category");
-  const storedLocation = localStorage.getItem("location");
-  const storedImage = localStorage.getItem("ImageBase64");
-  const storedStory = localStorage.getItem("story"); // ✅ Add this
-
-  console.log("🔍 Loading preview data...");
-  console.log("storedPostContents:", storedPostContents);
-
-  if (storedPostContents) {
-    try {
-      const parsed = JSON.parse(storedPostContents);
-      console.log("📦 Parsed postContents:", parsed);
-      
-      // ✅ Set data with fallbacks
-      setCaptions(parsed.captions || []);
-      setHashtags(parsed.hashtags || []);
-      setSeoTags(parsed.seo_tags || []);
-      setDescription(parsed.description || storedStory || ""); // ✅ Use story as fallback
-      
-      // Set first caption as default if available
-      if (parsed?.captions?.length > 0) {
-        setSelectedCaption(parsed.captions[0]);
-        console.log("✅ Set default caption:", parsed.captions[0]);
-      } else {
-        console.warn("⚠️ No captions found in postContents");
-      }
-    } catch (err) {
-      console.error("❌ Failed to parse postContents:", err);
+  const speak = (text: string) => {
+    if (!window.speechSynthesis) {
+      alert("Sorry, your browser does not support text-to-speech.");
+      return;
     }
-  } else {
-    console.warn("⚠️ No postContents in localStorage");
-  }
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-US"; // Indian English accent
+    utterance.rate = 1;
+    utterance.pitch = 1.2;
+    window.speechSynthesis.cancel(); // stop ongoing speech
+    window.speechSynthesis.speak(utterance);
+  };
 
-  if (storedTitle) setTitle(storedTitle);
-  if (storedCategory) setCategory(storedCategory);
-  if (storedLocation) setLocation(storedLocation);
-  
-  // ✅ Validate before setting
-  if (storedImage && storedImage.startsWith("data:image/")) {
-    setImageBase64(storedImage);
-    console.log("✅ Image loaded");
-  } else {
-    console.warn("⚠️ No valid imageBase64 found in localStorage");
-  }
-}, []);
+  useEffect(() => {
+    // Read from localStorage
+    const storedPostContents = localStorage.getItem("postContents");
+    const storedTitle = localStorage.getItem("userTitle");
+    const storedCategory = localStorage.getItem("category");
+    const storedLocation = localStorage.getItem("location");
+    const storedImage = localStorage.getItem("ImageBase64");
+    const storedStory = localStorage.getItem("story"); // ✅ Add this
 
+    console.log("🔍 Loading preview data...");
+    console.log("storedPostContents:", storedPostContents);
+
+    if (storedPostContents) {
+      try {
+        const parsed = JSON.parse(storedPostContents);
+        console.log("📦 Parsed postContents:", parsed);
+
+        // ✅ Set data with fallbacks
+        setCaptions(parsed.captions || []);
+        setHashtags(parsed.hashtags || []);
+        setSeoTags(parsed.seo_tags || []);
+        setDescription(parsed.description || storedStory || ""); // ✅ Use story as fallback
+
+        // Set first caption as default if available
+        if (parsed?.captions?.length > 0) {
+          setSelectedCaption(parsed.captions[0]);
+          console.log("✅ Set default caption:", parsed.captions[0]);
+        } else {
+          console.warn("⚠️ No captions found in postContents");
+        }
+      } catch (err) {
+        console.error("❌ Failed to parse postContents:", err);
+      }
+    } else {
+      console.warn("⚠️ No postContents in localStorage");
+    }
+
+    if (storedTitle) setTitle(storedTitle);
+    if (storedCategory) setCategory(storedCategory);
+    if (storedLocation) setLocation(storedLocation);
+
+    // ✅ Validate before setting
+    if (storedImage && storedImage.startsWith("data:image/")) {
+      setImageBase64(storedImage);
+      console.log("✅ Image loaded");
+    } else {
+      console.warn("⚠️ No valid imageBase64 found in localStorage");
+    }
+  }, []);
 
   const InstagramPost = () => (
     <div className="bg-white rounded-lg overflow-hidden shadow-sm">
@@ -179,7 +192,9 @@ export default function PreviewPage({
         </div>
 
         {hashtags.length > 0 && (
-          <div className="text-xs text-blue-800 mt-2">{hashtags.join(" ")}</div>
+          <div className="text-xs text-blue-800 mt-2 wrap-break-word">
+            {hashtags.join(" ")}
+          </div>
         )}
 
         <div className="text-xs text-gray-500 mt-2">2 hours ago</div>
@@ -212,7 +227,9 @@ export default function PreviewPage({
           {selectedCaption || "Select a caption to preview here"}
         </div>
         {hashtags.length > 0 && (
-          <div className="text-xs text-blue-600 mb-3">{hashtags.join(" ")}</div>
+          <div className="text-xs text-blue-600 mb-3 wrap-anywhere">
+            {hashtags.join(" ")}
+          </div>
         )}
       </div>
 
@@ -343,31 +360,45 @@ export default function PreviewPage({
                   </h3>
                   <div className="space-y-3">
                     {captions.map((cap, idx) => (
-                      <motion.div
-                        key={idx}
-                        whileTap={{ scale: 0.97 }}
-                        className={`cursor-pointer p-4 rounded-xl border transition-all ${
-                          selectedCaption === cap
-                            ? "bg-gradient-to-r from-blue-600 to-indigo-500 text-white border-blue-600 shadow-lg"
-                            : "bg-white/70 dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:border-blue-500 text-gray-800 dark:text-gray-200"
-                        }`}
-                        onClick={() => setSelectedCaption(cap)}
-                      >
-                        <div className="flex items-start space-x-3">
-                          <div
-                            className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 ${
-                              selectedCaption === cap
-                                ? "border-white bg-white"
-                                : "border-gray-300 dark:border-gray-600"
-                            }`}
-                          >
-                            {selectedCaption === cap && (
-                              <div className="w-full h-full rounded-full bg-blue-600 scale-50"></div>
-                            )}
+                      <div className="flex items-center gap-4">
+                        <motion.div
+                          key={idx}
+                          whileTap={{ scale: 0.97 }}
+                          className={`cursor-pointer p-4 rounded-xl border transition-all ${
+                            selectedCaption === cap
+                              ? "bg-gradient-to-r from-blue-600 to-indigo-500 text-white border-blue-600 shadow-lg"
+                              : "bg-white/70 dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:border-blue-500 text-gray-800 dark:text-gray-200"
+                          }`}
+                          onClick={() => setSelectedCaption(cap)}
+                        >
+                          <div className="flex items-start space-x-3">
+                            <div
+                              className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 ${
+                                selectedCaption === cap
+                                  ? "border-white bg-white"
+                                  : "border-gray-300 dark:border-gray-600"
+                              }`}
+                            >
+                              {selectedCaption === cap && (
+                                <div className="w-full h-full rounded-full bg-blue-600 scale-50"></div>
+                              )}
+                            </div>
+                            <p className="text-sm flex-1">{cap}</p>
                           </div>
-                          <p className="text-sm flex-1">{cap}</p>
-                        </div>
-                      </motion.div>
+                        </motion.div>
+                        <motion.button
+                          key={idx}
+                          onClick={() => {
+                            speak(cap);
+                          }}
+                          whileTap={{ scale: 0.97 }}
+                          className={`w-10 md:grid md:grid-cols-2 text-left px-2 py-2  hover:border-2 hover:from-blue-600! hover:to-indigo-600! border transition bg-gradient-to-r from-blue-600 rounded-full to-indigo-400 text-white border-blue-300 shadow"
+                                     
+                                            `}
+                        >
+                          <Volume2 className="h-5 w-5  text-white  transition" />
+                        </motion.button>
+                      </div>
                     ))}
                   </div>
                 </Card>
@@ -376,51 +407,50 @@ export default function PreviewPage({
           </AnimatePresence>
 
           {/* Hashtags and SEO */}
-       {/* Hashtags and SEO */}
-{(hashtags.length > 0 || seoTags.length > 0) && (
-  <div >
-    <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
-      Hashtags & SEO
-    </h3>
-    <div className="space-y-4">
-      {hashtags.length > 0 && (
-        <div>
-          <span className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 block">
-            Hashtags:
-          </span>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {hashtags.map((tag, index) => (
-              <span
-                key={index}
-                className="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-sm rounded-full border border-blue-200 dark:border-blue-800 whitespace-nowrap"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-      {seoTags.length > 0 && (
-        <div>
-          <span className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 block">
-            SEO Tags:
-          </span>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {seoTags.map((tag, index) => (
-              <span
-                key={index}
-                className="inline-block px-3 py-1.5 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-medium border border-purple-200 dark:border-purple-800 shadow-sm hover:shadow-md transition-shadow break-words max-w-full"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  </div>
-)}
-
+          {/* Hashtags and SEO */}
+          {(hashtags.length > 0 || seoTags.length > 0) && (
+            <div>
+              <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
+                Hashtags & SEO
+              </h3>
+              <div className="space-y-4">
+                {hashtags.length > 0 && (
+                  <div>
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 block">
+                      Hashtags:
+                    </span>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {hashtags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-sm rounded-full border border-blue-200 dark:border-blue-800 whitespace-nowrap"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {seoTags.length > 0 && (
+                  <div>
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 block">
+                      SEO Tags:
+                    </span>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {seoTags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="inline-block px-3 py-1.5 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-medium border border-purple-200 dark:border-purple-800 shadow-sm hover:shadow-md transition-shadow break-words max-w-full"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right Panel - Phone Preview */}
@@ -496,13 +526,13 @@ export default function PreviewPage({
           </motion.div>
           <div className="border-2 mt-3 border-dotted border-gray-400 rounded-lg p-6 text-center">
             <p className="text-gray-600 font-medium">
-               Automatic Post Scheduling is enabled — just click and relax!
+              Automatic Post Scheduling is enabled — just click and relax!
             </p>
           </div>
         </div>
       </div>
 
-     {/* Action Buttons & Instagram Banner */}
+      {/* Action Buttons & Instagram Banner */}
       {/* Action Buttons & Instagram Banner */}
       <div className="w-full max-w-6xl space-y-6 mt-8">
         {/* Action Buttons */}
@@ -547,17 +577,25 @@ export default function PreviewPage({
                     return;
                   }
 
-                  console.log(`📦 Preparing to save product (Attempt ${attemptNumber + 1}/${maxRetries + 1})...`, {
-                    userTitle,
-                    category,
-                    location,
-                    hasImage: !!imageBase64Local,
-                    hasStory: !!story,
-                    finalCaption,
-                  });
+                  console.log(
+                    `📦 Preparing to save product (Attempt ${
+                      attemptNumber + 1
+                    }/${maxRetries + 1})...`,
+                    {
+                      userTitle,
+                      category,
+                      location,
+                      hasImage: !!imageBase64Local,
+                      hasStory: !!story,
+                      finalCaption,
+                    }
+                  );
 
                   // Convert base64 to File for FormData
-                  function base64ToFile(base64String: string, filename: string) {
+                  function base64ToFile(
+                    base64String: string,
+                    filename: string
+                  ) {
                     const arr = base64String.split(",");
                     const mimeMatch = arr[0].match(/:(.*?);/);
                     const mime = mimeMatch ? mimeMatch[1] : "";
@@ -573,7 +611,10 @@ export default function PreviewPage({
                   // Create FormData with all product data
                   const formData = new FormData();
 
-                  const imageFile = base64ToFile(imageBase64Local, "product.png");
+                  const imageFile = base64ToFile(
+                    imageBase64Local,
+                    "product.png"
+                  );
                   formData.append("image", imageFile);
                   formData.append("name", userTitle);
                   if (category) formData.append("category", category);
@@ -653,7 +694,12 @@ export default function PreviewPage({
 
                   navigate("/dashboard");
                 } catch (err: any) {
-                  console.error(`❌ Submission failed (Attempt ${attemptNumber + 1}/${maxRetries + 1}):`, err);
+                  console.error(
+                    `❌ Submission failed (Attempt ${attemptNumber + 1}/${
+                      maxRetries + 1
+                    }):`,
+                    err
+                  );
                   const errorMsg =
                     err?.response?.data?.message ||
                     err?.response?.data?.error ||
@@ -663,20 +709,34 @@ export default function PreviewPage({
                   // Check if we should retry
                   if (attemptNumber < maxRetries) {
                     setRetryCount(attemptNumber + 1);
-                    console.log(`🔄 Retrying... (Attempt ${attemptNumber + 2}/${maxRetries + 1})`);
-                    
+                    console.log(
+                      `🔄 Retrying... (Attempt ${attemptNumber + 2}/${
+                        maxRetries + 1
+                      })`
+                    );
+
                     // Show brief notification about retry
-                    alert(`Attempt ${attemptNumber + 1} failed. Retrying automatically... (${attemptNumber + 2}/${maxRetries + 1})`);
-                    
+                    alert(
+                      `Attempt ${
+                        attemptNumber + 1
+                      } failed. Retrying automatically... (${
+                        attemptNumber + 2
+                      }/${maxRetries + 1})`
+                    );
+
                     // Wait 2 seconds before retrying
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                    
+                    await new Promise((resolve) => setTimeout(resolve, 2000));
+
                     // Retry
                     return attemptSave(attemptNumber + 1);
                   } else {
                     // Max retries reached
                     setRetryCount(0);
-                    alert(`Error after ${maxRetries + 1} attempts: ${errorMsg}\n\nPlease try again or contact support if the issue persists.`);
+                    alert(
+                      `Error after ${
+                        maxRetries + 1
+                      } attempts: ${errorMsg}\n\nPlease try again or contact support if the issue persists.`
+                    );
                   }
                 } finally {
                   setLoading(false);
@@ -689,7 +749,11 @@ export default function PreviewPage({
             disabled={loading}
             className="bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? (retryCount > 0 ? `Retrying (${retryCount + 1}/${maxRetries + 1})...` : "Posting...") : "Save Product"}
+            {loading
+              ? retryCount > 0
+                ? `Retrying (${retryCount + 1}/${maxRetries + 1})...`
+                : "Posting..."
+              : "Save Product"}
           </Button>
         </div>
 
@@ -713,11 +777,15 @@ export default function PreviewPage({
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                 </svg>
                 <div className="text-center">
-                  <p className="text-xl font-bold">View Your Product Updates!</p>
-                  <p className="text-sm opacity-90 mt-1">Follow @artify769 on Instagram</p>
+                  <p className="text-xl font-bold">
+                    View Your Product Updates!
+                  </p>
+                  <p className="text-sm opacity-90 mt-1">
+                    Follow @artify769 on Instagram
+                  </p>
                 </div>
               </div>
             </div>

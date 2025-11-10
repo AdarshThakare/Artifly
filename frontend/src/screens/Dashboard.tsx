@@ -23,6 +23,8 @@ import {
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Jarvis from "../components/Jarvis";
+import ShareableListings from "../components/ShareableListings";
+import { Footer } from "../components/Footer";
 // import Jarvis from "../components/Jarvis.tsx"
 // Mock user data - replace with actual data from your backend
 const mockUser = {
@@ -51,7 +53,7 @@ interface Product {
   seo_tags: string[];
   images: string[];
   user: string;
-  timestamp: string;
+  updatedAt: string;
 }
 
 interface User {
@@ -86,7 +88,7 @@ const CardHeader = ({ children }: { children: React.ReactNode }) => (
 );
 
 const CardTitle = ({ children }: { children: React.ReactNode }) => (
-  <h2 className="text-lg font-semibold text-gray-900">{children}</h2>
+  <h2 className="text-xl font-semibold text-gray-900">{children}</h2>
 );
 
 const Button = ({
@@ -123,14 +125,6 @@ const Button = ({
     </button>
   );
 };
-
-const Footer = () => (
-  <footer className="bg-white border-t border-gray-200 py-6 mt-auto">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-600 text-sm">
-      © 2025 Artisan Platform. All rights reserved.
-    </div>
-  </footer>
-);
 
 const EditProfileModal = ({
   isOpen,
@@ -185,7 +179,7 @@ const EditProfileModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0008]">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-xl max-h-[90vh] overflow-hidden">
         {/* Modal Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5">
           <div className="flex items-center justify-between">
@@ -202,7 +196,7 @@ const EditProfileModal = ({
                 )}
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white">
+                <h2 className="text-xl font-bold text-white">
                   Welcome {user.firstName} {user.lastName}!
                 </h2>
                 <p className="text-blue-100 text-sm mt-1">{user.email}</p>
@@ -444,7 +438,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-500">Total Views</p>
-                    <p className="text-2xl font-bold">590</p>
+                    <p className="text-xl font-bold">590</p>
                   </div>
                   <Eye className="h-8 w-8 text-blue-600" />
                 </div>
@@ -461,7 +455,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-500">Total Likes</p>
-                    <p className="text-2xl font-bold">39</p>
+                    <p className="text-xl font-bold">39</p>
                   </div>
                   <Heart className="h-8 w-8 text-pink-600" />
                 </div>
@@ -478,7 +472,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-500">Avg. Rating</p>
-                    <p className="text-2xl font-bold">4.8</p>
+                    <p className="text-xl font-bold">4.8</p>
                   </div>
                   <Star className="h-8 w-8 text-yellow-500" />
                 </div>
@@ -493,7 +487,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-500">Story Score</p>
-                    <p className="text-2xl font-bold">92</p>
+                    <p className="text-xl font-bold">92</p>
                   </div>
                   <BarChart3 className="h-8 w-8 text-blue-600" />
                 </div>
@@ -505,13 +499,13 @@ export default function DashboardPage() {
             </Card>
           </div>
 
-          {/* Product Upload Card */}
+          {/* Product Upl*/}
           <Card className="mb-8">
             <CardHeader>
               <CardTitle>
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2">
-                    <Upload className="h-5 w-5 text-blue-600" />
+                    <Upload className="h-6 w-6 text-blue-600" />
                     Upload New Product
                   </span>
                   <Button
@@ -532,9 +526,9 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle>
                 {products ? (
-                  <span>Your Products ({products.length})</span>
+                  <span>Your Social Posts ({products.length})</span>
                 ) : (
-                  <span>Your Products : 0</span>
+                  <span>Your Social Posts : 0</span>
                 )}
               </CardTitle>
             </CardHeader>
@@ -584,16 +578,16 @@ export default function DashboardPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="h-8 w-8 p-0 bg-white/90 hover:bg-white border-white/50 hover:border-white shadow-sm"
+                            className="h-8 w-8 p-0! bg-white/90 hover:bg-white border-white/50 hover:border-white shadow-sm"
                           >
-                            <Edit className="h-3 w-3" />
+                            <Edit className="size-4" />
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
-                            className="h-8 w-8 p-0 bg-white/90 hover:bg-red-50 border-white/50 hover:border-red-200 shadow-sm text-red-600 hover:text-red-700"
+                            className="h-8 w-8 p-0! bg-white/90 hover:bg-red-50 border-white/50 hover:border-red-200 shadow-sm text-red-600 hover:text-red-700"
                           >
-                            <Trash2 className="h-3 w-3" />
+                            <Trash2 className="size-4" />
                           </Button>
                         </div>
                       </div>
@@ -601,14 +595,14 @@ export default function DashboardPage() {
                       {/* Product Info */}
                       <div className="p-4">
                         <div className="mb-3">
-                          <h3 className="font-semibold text-gray-900 text-sm line-clamp-1 mb-1">
+                          <h3 className="font-semibold text-gray-900 text-md line-clamp-1 mb-1">
                             {product.name ||
                               product.title ||
                               "Untitled Product"}
                           </h3>
 
                           {product.caption && (
-                            <p className="text-gray-600 text-xs line-clamp-2 leading-relaxed">
+                            <p className="text-gray-600 text-sm line-clamp-2 leading-relaxed">
                               {product.caption}
                             </p>
                           )}
@@ -617,13 +611,13 @@ export default function DashboardPage() {
                         {/* Category and Location */}
                         <div className="space-y-1 mb-3">
                           {product.category && (
-                            <div className="flex items-center text-xs text-gray-500">
+                            <div className="flex items-center text-sm text-gray-500">
                               <Tag className="h-3 w-3 mr-1 text-blue-500" />
                               {product.category}
                             </div>
                           )}
                           {product.location && (
-                            <div className="flex items-center text-xs text-gray-500">
+                            <div className="flex items-center text-sm text-gray-500">
                               <MapPin className="h-3 w-3 mr-1 text-green-500" />
                               {product.location}
                             </div>
@@ -653,17 +647,17 @@ export default function DashboardPage() {
 
                         {/* Stats and Date */}
                         <div className="flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-gray-50">
-                          <div className="flex items-center space-x-3">
+                          <div className="flex items-center space-x-3 text-sm">
                             <span className="flex items-center">
-                              <Eye className="h-3 w-3 mr-1" />0
+                              <Eye className="h-3 w-3 mr-1" />4
                             </span>
-                            <span className="flex items-center">
+                            <span className="flex items-center text-sm">
                               <Heart className="h-3 w-3 mr-1" />0
                             </span>
                           </div>
-                          <span className="flex items-center">
+                          <span className="flex items-center text-sm">
                             <Calendar className="h-3 w-3 mr-1" />
-                            {formatDate(product.timestamp)}
+                            {formatDate(product.updatedAt)}
                           </span>
                         </div>
                       </div>
@@ -673,6 +667,7 @@ export default function DashboardPage() {
               )}
             </CardContent>
           </Card>
+          <ShareableListings />
         </div>
       </main>
       <Jarvis />

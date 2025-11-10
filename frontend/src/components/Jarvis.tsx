@@ -996,7 +996,7 @@ User Query: ${query}`;
       </button>
 
       {/* Pointing Message */}
-      {!isPanelOpen && (
+      {tooltipVisible && (
         <div className="fixed bottom-24 right-6 z-40 animate-bounce">
           <div className="relative bg-white backdrop-blur-sm rounded-2xl shadow-2xl p-4 mb-2 border-2 border-black">
             <div className="absolute right-6 bottom-0 transform translate-y-full w-4 h-4 bg-white border-r-2 border-b-2 border-black rotate-45"></div>
