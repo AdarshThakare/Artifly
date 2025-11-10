@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import Jarvis from "../components/Jarvis";
 import ShareableListings from "../components/ShareableListings";
 import { Footer } from "../components/Footer";
+import SocialPosts from "../components/SocialPosts";
 // import Jarvis from "../components/Jarvis.tsx"
 // Mock user data - replace with actual data from your backend
 const mockUser = {
@@ -39,23 +40,6 @@ const mockUser = {
   instagramLink: "https://instagram.com/johndoe",
   facebookLink: "https://facebook.com/johndoe",
 };
-
-interface Product {
-  _id: string;
-  name: string;
-  category: string;
-  location: string;
-  description: string;
-  title: string;
-  story: string;
-  caption: string;
-  hashtags: string[];
-  seo_tags: string[];
-  images: string[];
-  user: string;
-  updatedAt: string;
-}
-
 interface User {
   clerkId: string;
   email: string;
@@ -341,33 +325,12 @@ const EditProfileModal = ({
 };
 
 export default function DashboardPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userData, setUserData] = useState<User>(mockUser);
 
   const navigate = useNavigate();
   const { user } = useUser();
   const firstName = user?.firstName;
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const clerkId = user?.id;
-        setLoading(true);
-        const response = await axios.get(
-          `https://artifly-backend.onrender.com/api/v1/post/${clerkId}`
-        );
-        setProducts(response.data?.posts);
-      } catch (err) {
-        setProducts([]);
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
 
   const handleSaveProfile = (updatedData: Partial<User>) => {
     // Here you would make an API call to save the data
@@ -383,32 +346,6 @@ export default function DashboardPage() {
       month: "short",
       day: "numeric",
     });
-  };
-
-  const getStatusBadge = (product: Product) => {
-    const hasContent =
-      product.name || product.description || product.title || product.story;
-    const hasImage = product.images[0];
-
-    if (hasContent && hasImage) {
-      return (
-        <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
-          Active
-        </span>
-      );
-    } else if (hasContent || hasImage) {
-      return (
-        <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
-          In Progress
-        </span>
-      );
-    } else {
-      return (
-        <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
-          Draft
-        </span>
-      );
-    }
   };
 
   return (
@@ -522,151 +459,7 @@ export default function DashboardPage() {
           </Card>
 
           {/* Product Listings */}
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                {products ? (
-                  <span>Your Social Posts ({products.length})</span>
-                ) : (
-                  <span>Your Social Posts : 0</span>
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="flex justify-center items-center py-12">
-                  <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-                  <span className="ml-3 text-gray-600 text-sm">
-                    Loading products...
-                  </span>
-                </div>
-              ) : products.length === 0 ? (
-                <div className="text-center py-12">
-                  <ImageIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">
-                    No products yet. Add your first product to get started!
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {products.map((product) => (
-                    <div
-                      key={product._id}
-                      className="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-gray-200 hover:-translate-y-1"
-                    >
-                      {/* Product Image */}
-                      <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
-                        {product.images.length > 0 ? (
-                          <img
-                            src={`${product.images[0]}`}
-                            alt={product.name || "Product"}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <ImageIcon className="h-16 w-16 text-gray-300" />
-                          </div>
-                        )}
-
-                        {/* Status Badge */}
-                        <div className="absolute top-3 left-3">
-                          {getStatusBadge(product)}
-                        </div>
-
-                        {/* Action Buttons Overlay */}
-                        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-1">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 w-8 p-0! bg-white/90 hover:bg-white border-white/50 hover:border-white shadow-sm"
-                          >
-                            <Edit className="size-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 w-8 p-0! bg-white/90 hover:bg-red-50 border-white/50 hover:border-red-200 shadow-sm text-red-600 hover:text-red-700"
-                          >
-                            <Trash2 className="size-4" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Product Info */}
-                      <div className="p-4">
-                        <div className="mb-3">
-                          <h3 className="font-semibold text-gray-900 text-md line-clamp-1 mb-1">
-                            {product.name ||
-                              product.title ||
-                              "Untitled Product"}
-                          </h3>
-
-                          {product.caption && (
-                            <p className="text-gray-600 text-sm line-clamp-2 leading-relaxed">
-                              {product.caption}
-                            </p>
-                          )}
-                        </div>
-
-                        {/* Category and Location */}
-                        <div className="space-y-1 mb-3">
-                          {product.category && (
-                            <div className="flex items-center text-sm text-gray-500">
-                              <Tag className="h-3 w-3 mr-1 text-blue-500" />
-                              {product.category}
-                            </div>
-                          )}
-                          {product.location && (
-                            <div className="flex items-center text-sm text-gray-500">
-                              <MapPin className="h-3 w-3 mr-1 text-green-500" />
-                              {product.location}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Hashtags */}
-                        {product.hashtags && product.hashtags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mb-3">
-                            {product.hashtags
-                              .slice(0, 2)
-                              .map((hashtag, index) => (
-                                <span
-                                  key={index}
-                                  className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-md font-medium"
-                                >
-                                  #{hashtag}
-                                </span>
-                              ))}
-                            {product.hashtags.length > 2 && (
-                              <span className="px-2 py-1 bg-gray-50 text-gray-500 text-xs rounded-md">
-                                +{product.hashtags.length - 2}
-                              </span>
-                            )}
-                          </div>
-                        )}
-
-                        {/* Stats and Date */}
-                        <div className="flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-gray-50">
-                          <div className="flex items-center space-x-3 text-sm">
-                            <span className="flex items-center">
-                              <Eye className="h-3 w-3 mr-1" />4
-                            </span>
-                            <span className="flex items-center text-sm">
-                              <Heart className="h-3 w-3 mr-1" />0
-                            </span>
-                          </div>
-                          <span className="flex items-center text-sm">
-                            <Calendar className="h-3 w-3 mr-1" />
-                            {formatDate(product.updatedAt)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <SocialPosts />
           <ShareableListings />
         </div>
       </main>

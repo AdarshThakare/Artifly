@@ -9,6 +9,8 @@ import {
   getSocialPostById,
   storeDescription,
   getSocialPostsByClerkId,
+  EditSocialPost,
+  deleteSocialPost,
 } from "../controllers/socialPostController.js";
 import upload from "../lib/multer.js";
 
@@ -26,5 +28,11 @@ router.post("/store-image", upload.single("image"), storeImage);
 router.get("/", getAllSocialPosts);
 router.get("/:clerkId", getSocialPostsByClerkId);
 router.get("/:postId", getSocialPostById);
+
+router.patch("/:postId", EditSocialPost);
+router.put("/:postId", EditSocialPost);
+
+// Delete post
+router.delete("/:postId", deleteSocialPost);
 
 export default router;

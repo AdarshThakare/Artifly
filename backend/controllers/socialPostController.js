@@ -166,3 +166,75 @@ export const getSocialPostsByClerkId = async (req, res) => {
     });
   }
 };
+
+/**
+ * @desc Update (PUT/PATCH) a social post
+ * @route PATCH /api/v1/post/:id
+ * @route PUT   /api/v1/post/:id
+ * @access Private (assuming user is authenticated)
+ */
+export const EditSocialPost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    // Check if post exists
+    const post = await SocialPost.findById(postId);
+    if (!post) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Post not found" });
+    }
+
+    // Update fields — PATCH will only update the provided ones
+    const updatedPost = await SocialPost.findByIdAndUpdate(postId, req.body, {
+      new: true, // return updated document
+      runValidators: true, // ensure mongoose validators still apply
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Post updated successfully",
+      post: updatedPost,
+    });
+  } catch (error) {
+    console.error("Error updating post:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while updating post",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * @desc Delete a social post
+ * @route DELETE /api/v1/post/:id
+ * @access Private (assuming user is authenticated)
+ */
+export const deleteSocialPost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    // Check if post exists
+    const post = await SocialPost.findById(postId);
+    if (!post) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Post not found" });
+    }
+
+    await SocialPost.findByIdAndDelete(postId);
+
+    res.status(200).json({
+      success: true,
+      message: "Post deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while deleting post",
+      error: error.message,
+    });
+  }
+};

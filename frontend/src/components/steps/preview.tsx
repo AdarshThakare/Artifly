@@ -360,9 +360,8 @@ export default function PreviewPage({
                   </h3>
                   <div className="space-y-3">
                     {captions.map((cap, idx) => (
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-4" key={idx}>
                         <motion.div
-                          key={idx}
                           whileTap={{ scale: 0.97 }}
                           className={`cursor-pointer p-4 rounded-xl border transition-all ${
                             selectedCaption === cap

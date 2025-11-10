@@ -260,9 +260,8 @@ export default function Step2Story({
               </p>
               <div className="grid gap-3">
                 {[typedText, ...aiDescriptions].map((t, idx) => (
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4" key={idx}>
                     <motion.button
-                      key={idx}
                       onClick={async () => {
                         console.log("🔘 Description clicked:", t);
 

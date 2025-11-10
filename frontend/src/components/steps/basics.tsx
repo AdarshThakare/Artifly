@@ -414,7 +414,7 @@ export default function Step1Basics({
               </div>
               <div className="grid gap-3">
                 {[title, ...aiTitles].map((t, idx) => (
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4" key={idx}>
                     <motion.button
                       key={idx}
                       onClick={() => {
