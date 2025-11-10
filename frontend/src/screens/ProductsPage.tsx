@@ -86,7 +86,7 @@ const ShareableProductPage = () => {
         `https://artifly-backend.onrender.com/api/v1/post/product/${id}`
       );
 
-      setProduct(response.data?.product || response.data);
+      setProduct(response.data?.data || response.data);
     } catch (err: any) {
       console.error("Error fetching product:", err);
       setError("Failed to load product. Please try again.");
