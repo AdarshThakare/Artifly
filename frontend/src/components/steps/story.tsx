@@ -376,7 +376,6 @@ export default function Step2Story({
                       {loading && selectedDescription === t ? t : t}
                     </motion.button>
                     <motion.button
-                      key={idx}
                       onClick={() => {
                         speak(t);
                       }}

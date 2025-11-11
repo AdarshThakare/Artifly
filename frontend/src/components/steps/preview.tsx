@@ -386,7 +386,6 @@ export default function PreviewPage({
                           </div>
                         </motion.div>
                         <motion.button
-                          key={idx}
                           onClick={() => {
                             speak(cap);
                           }}

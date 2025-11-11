@@ -85,8 +85,8 @@ const ShareableProductPage = () => {
       const response = await axios.get(
         `https://artifly-backend.onrender.com/api/v1/post/product/${id}`
       );
-
-      setProduct(response.data?.data || response.data);
+      console.log(response.data.data);
+      setProduct(response.data?.data);
     } catch (err: any) {
       console.error("Error fetching product:", err);
       setError("Failed to load product. Please try again.");
@@ -335,36 +335,38 @@ const ShareableProductPage = () => {
       </header>
 
       {/* Main Content */}
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Image Section */}
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden sticky top-24 h-fit">
-            <div className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-8">
-              <img
-                src={product.images[0]}
-                alt={product.name}
-                className="w-full h-full object-contain rounded-lg"
-              />
-            </div>
-
-            {/* Thumbnail Gallery */}
-            {product.images.length > 1 && (
-              <div className="p-4 flex space-x-2 overflow-x-auto">
-                {product.images.map((img, index) => (
-                  <div
-                    key={index}
-                    className="flex-shrink-0 w-20 h-20 bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200 hover:border-blue-400 cursor-pointer transition-colors"
-                  >
-                    <img
-                      src={img}
-                      alt={`${product.name} ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
+          {product.images.length && (
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden sticky top-24 h-fit">
+              <div className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-8">
+                <img
+                  src={product.images[0]}
+                  alt={product.name}
+                  className="w-full h-full object-contain rounded-lg"
+                />
               </div>
-            )}
-          </div>
+              {/* Thumbnail Gallery */}
+              {product.images.length > 1 && (
+                <div className="p-4 flex space-x-2 overflow-x-auto">
+                  {product.images.map((img, index) => (
+                    <div
+                      key={index}
+                      className="flex-shrink-0 w-20 h-20 bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200 hover:border-blue-400 cursor-pointer transition-colors"
+                    >
+                      <img
+                        src={img}
+                        alt={`${product.name} ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Details Section */}
           <div className="space-y-6">

@@ -416,7 +416,6 @@ export default function Step1Basics({
                 {[title, ...aiTitles].map((t, idx) => (
                   <div className="flex items-center gap-4" key={idx}>
                     <motion.button
-                      key={idx}
                       onClick={() => {
                         setSelectedTitle(t);
                       }}
@@ -430,7 +429,6 @@ export default function Step1Basics({
                       {t}
                     </motion.button>
                     <motion.button
-                      key={idx}
                       onClick={() => {
                         speak(t);
                       }}
