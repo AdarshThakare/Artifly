@@ -33,7 +33,7 @@ export function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <img src="logo.png" alt="" className="size-7 rounded-full" />{" "}
+            <img src="/logo.png" alt="" className="size-7 rounded-full" />{" "}
             <span className="text-xl font-bold text-foreground">ARTIFLY</span>
           </Link>
 
