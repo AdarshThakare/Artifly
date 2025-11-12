@@ -59,7 +59,7 @@ const CardTitle = ({ children }: { children: React.ReactNode }) => (
   <h2 className="text-xl font-semibold text-gray-900">{children}</h2>
 );
 
-const SocialPosts = () => {
+const SocialPosts = ({ onEffectRun }: { onEffectRun: () => void }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
@@ -99,6 +99,7 @@ const SocialPosts = () => {
       }
     };
     fetchData();
+    onEffectRun();
   }, [user]);
 
   const getStatusBadge = (product: Product) => {

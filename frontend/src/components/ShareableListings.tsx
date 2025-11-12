@@ -101,7 +101,7 @@ interface Product {
 //   },
 // ];
 
-const ShareableListings = () => {
+const ShareableListings = ({ trigger }: { trigger: boolean }) => {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [showQRModal, setShowQRModal] = useState(false);
   const [qrProduct, setQrProduct] = useState<any>(null);
@@ -127,7 +127,7 @@ const ShareableListings = () => {
   };
   useEffect(() => {
     fetchData();
-  }, [user]);
+  }, [trigger]);
 
   const generateShareableLink = (productId: any) => {
     return `https://artifly-seven.vercel.app/product/${productId}`;

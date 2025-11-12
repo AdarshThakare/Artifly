@@ -312,7 +312,7 @@ const ShareableProductPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+      <header className="bg-white border-b border-gray-200  top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <button
@@ -340,7 +340,7 @@ const ShareableProductPage = () => {
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Image Section */}
           {product.images.length && (
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden sticky top-24 h-fit">
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden  top-24 h-fit">
               <div className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-8">
                 <img
                   src={product.images[0]}
