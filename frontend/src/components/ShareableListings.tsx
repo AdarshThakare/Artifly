@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
 import axios from "axios";
+import { QRCodeCanvas } from "qrcode.react";
+import { useRef } from "react";
 
 interface Product {
   _id: string;
@@ -108,6 +110,64 @@ const ShareableListings = ({ trigger }: { trigger: boolean }) => {
   const [copied, setCopied] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const qrRef = useRef<HTMLDivElement | null>(null);
+
+  const getCanvas = (): HTMLCanvasElement | null => {
+    const container = qrRef.current;
+    if (!container) return null;
+    const el = container.querySelector("canvas");
+    return el instanceof HTMLCanvasElement ? el : null;
+  };
+
+  const downloadQR = () => {
+    const canvas = getCanvas();
+    if (!canvas) {
+      console.warn("QR canvas not found");
+      return;
+    }
+
+    const pngUrl = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = pngUrl;
+    link.download = `${qrProduct?.name ?? "qr"}-qr.png`;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
+
+  const shareQR = () => {
+    const canvas = getCanvas();
+    if (!canvas) {
+      console.warn("QR canvas not found");
+      return;
+    }
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) {
+        console.warn("Failed to create blob from canvas");
+        return;
+      }
+
+      const fileName = `${qrProduct?.name ?? "qr"}-qr.png`;
+      const file = new File([blob], fileName, { type: "image/png" });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            title: `QR: ${qrProduct?.name ?? ""}`,
+            text: "Scan to view product details",
+            files: [file],
+          });
+        } catch (err) {
+          console.log("Share cancelled or failed:", err);
+        }
+      } else {
+        // fallback to download
+        downloadQR();
+      }
+    }, "image/png");
+  };
 
   const { user } = useUser();
   const fetchData = async () => {
@@ -510,16 +570,18 @@ const ShareableListings = ({ trigger }: { trigger: boolean }) => {
               </p>
             </div>
 
-            {/* QR Code Placeholder - You'd integrate a real QR code library here */}
             <div className="bg-white p-6 rounded-lg border-2 border-gray-200 mb-6">
               <div className="bg-gray-100 h-64 flex items-center justify-center rounded">
-                <div className="text-center">
-                  <QrCode className="h-32 w-32 text-gray-300 mx-auto mb-4" />
-                  <p className="text-xs text-gray-500">
-                    QR Code would appear here
-                    <br />
-                    Use a library like 'qrcode.react' or 'qr-code-styling'
-                  </p>
+                <div className="text-center" ref={qrRef}>
+                  <QRCodeCanvas
+                    value={`https://artifly-seven.vercel.app/product/${qrProduct._id}`}
+                    title={qrProduct.name}
+                    size={200}
+                    bgColor={"#ffffff"}
+                    fgColor={"#000000"}
+                    level={"L"}
+                    marginSize={2}
+                  />
                 </div>
               </div>
             </div>
@@ -538,7 +600,10 @@ const ShareableListings = ({ trigger }: { trigger: boolean }) => {
                 )}
                 <span>{copied ? "Copied!" : "Copy Link"}</span>
               </button>
-              <button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 rounded-lg transition-colors">
+              <button
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 rounded-lg transition-colors"
+                onClick={downloadQR}
+              >
                 Download QR Code
               </button>
             </div>
